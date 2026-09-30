@@ -1,0 +1,22 @@
+<h1>Quản lý tài khoản</h1>
+<div class="card">
+  <form class="toolbar" id="uf">
+    <div><label>Tìm kiếm</label><input name="q" placeholder="username / họ tên"></div>
+    <div><label>Vai trò</label><select name="role" id="uf-role"></select></div>
+    <button>Lọc</button>
+  </form>
+  <div id="ures"></div>
+</div>
+<template id="users-table-tpl">
+  <div class="table-wrap"><table>
+    <tr><th>Username</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th><th></th></tr>
+    <tbody data-f="rows"></tbody>
+  </table></div>
+</template>
+<template id="urow-tpl">
+  <tr>
+    <td data-f="username"></td><td data-f="full_name"></td><td><span class="badge" data-f="role"></span></td>
+    <td><span class="badge" data-f="active"></span></td>
+    <td><button class="sm sec tg"></button> <button class="sm sec rs">Đặt lại MK</button></td>
+  </tr>
+</template>

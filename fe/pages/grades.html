@@ -1,0 +1,26 @@
+<h1>Danh sách điểm</h1>
+<div class="card">
+  <form class="toolbar" id="gf">
+    <div><label>Mã / tên SV</label><input name="q"></div>
+    <div><label>Học kỳ</label><select name="semester_id" id="gf-sem"></select></div>
+    <div><label>Môn học</label><select name="subject_id" id="gf-sub"></select></div>
+    <div><label>Kết quả</label><select name="result"><option value="">Tất cả</option><option value="PASSED">Đạt</option><option value="FAILED">Không đạt</option></select></div>
+    <button>Lọc</button>
+  </form>
+  <div id="gres"></div>
+</div>
+<template id="grades-table-tpl">
+  <div class="table-wrap"><table>
+    <tr><th>Mã SV</th><th>Họ tên</th><th>Môn học</th><th>Học kỳ</th><th>Giáo viên</th><th class="num">Điểm</th><th>Loại</th><th>Kết quả</th><th>Sửa</th></tr>
+    <tbody data-f="rows"></tbody>
+  </table></div>
+</template>
+<template id="grow-tpl">
+  <tr>
+    <td data-f="student_code"></td><td data-f="full_name"></td><td data-f="subject"></td><td data-f="semester_name"></td><td data-f="teacher_name"></td>
+    <td class="num"><b data-f="total_score"></b></td><td data-f="letter_grade"></td><td><span class="badge" data-f="result"></span></td>
+    <td data-f="edits"></td>
+  </tr>
+</template>
+<template id="hist-btn-tpl"><button class="sm sec hist"></button></template>
+<template id="empty-tpl"><div class="empty">Không có dữ liệu.</div></template>

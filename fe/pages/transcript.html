@@ -1,0 +1,39 @@
+<a href="#/lookup" class="no-print" id="back-link" style="display:none">← Quay lại tra cứu</a>
+<div class="card" style="margin-top:10px">
+  <h1 id="t-name"></h1>
+  <div class="profile" style="margin-top:12px">
+    <div><span>Mã sinh viên</span><b data-f="student_code"></b></div>
+    <div><span>Lớp</span><span data-f="class_code"></span></div>
+    <div><span>Ngành</span><span data-f="major_name"></span></div>
+    <div><span>Khoa</span><span data-f="department_name"></span></div>
+    <div><span>Ngày sinh</span><span data-f="dob"></span></div>
+    <div><span>Giới tính</span><span data-f="gender"></span></div>
+    <div><span>Năm nhập học</span><span data-f="admission_year"></span></div>
+    <div><span>Trạng thái</span><span class="badge" data-f="status" style="display:inline-block"></span></div>
+  </div>
+</div>
+<div class="grid c4" style="margin-bottom:18px" id="t-stats"></div>
+<div class="card">
+  <div class="toolbar no-print">
+    <div><label>Lọc theo học kỳ</label><select id="semf"></select></div>
+    <button class="sec" id="print">🖨 In bảng điểm</button>
+  </div>
+  <div id="t-body"></div>
+</div>
+<template id="sem-group-tpl">
+  <div>
+    <h2 style="margin-top:14px" data-f="title"></h2>
+    <div class="table-wrap"><table>
+      <tr><th>Mã môn</th><th>Tên môn</th><th class="num">Tín chỉ</th><th>Giáo viên</th><th class="num">CC</th><th class="num">GK</th><th class="num">CK</th><th class="num">Tổng kết</th><th>Xếp loại</th><th>Kết quả</th></tr>
+      <tbody data-f="rows"></tbody>
+    </table></div>
+  </div>
+</template>
+<template id="grade-row-tpl">
+  <tr>
+    <td data-f="subject_code"></td><td data-f="subject_name"></td><td class="num" data-f="credits"></td><td data-f="teacher_name"></td>
+    <td class="num" data-f="attendance_score"></td><td class="num" data-f="midterm_score"></td><td class="num" data-f="final_score"></td>
+    <td class="num"><b data-f="total_score"></b></td><td><b data-f="letter_grade"></b></td><td><span class="badge" data-f="result"></span></td>
+  </tr>
+</template>
+<template id="empty-tpl"><div class="empty">Chưa có dữ liệu điểm.</div></template>

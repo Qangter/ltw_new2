@@ -1,0 +1,25 @@
+<h1>Quản lý sinh viên</h1>
+<div class="card">
+  <form class="toolbar" id="stf">
+    <div><label>Mã / tên</label><input name="q"></div>
+    <div><label>Lớp</label><select name="class_id" id="stf-class"></select></div>
+    <div><label>Trạng thái</label><select name="status" id="stf-status"></select></div>
+    <button>Lọc</button>
+    <button type="button" class="sec" id="addst" style="margin-left:auto">＋ Thêm sinh viên</button>
+  </form>
+  <div id="stres"></div>
+</div>
+<template id="students-table-tpl">
+  <div class="table-wrap"><table>
+    <tr><th>Mã SV</th><th>Họ tên</th><th>Ngày sinh</th><th>Lớp</th><th>Email</th><th>Trạng thái</th><th></th></tr>
+    <tbody data-f="rows"></tbody>
+  </table></div>
+</template>
+<template id="strow-tpl">
+  <tr>
+    <td data-f="student_code"></td><td data-f="full_name"></td><td data-f="dob"></td><td data-f="class_code"></td><td data-f="email"></td>
+    <td><span class="badge" data-f="status"></span></td>
+    <td><button class="sm sec ed">Sửa</button> <button class="sm danger dl">Xóa</button></td>
+  </tr>
+</template>
+<template id="empty-tpl"><div class="empty">Không có dữ liệu.</div></template>

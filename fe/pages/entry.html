@@ -1,0 +1,39 @@
+<h1>Nhập / sửa điểm</h1>
+<p class="muted">Điểm tổng kết = 10% chuyên cần + 30% giữa kỳ + 60% cuối kỳ (nếu để trống CC/GK thì tổng kết = điểm cuối kỳ).</p>
+<div class="card">
+  <div class="toolbar">
+    <div><label>Học kỳ</label><select id="es"></select></div>
+    <div><label>Lớp học phần</label><select id="eo" style="min-width:320px"></select></div>
+  </div>
+  <div id="etable"></div>
+</div>
+<template id="entry-wrap-tpl">
+  <div>
+    <div class="toolbar">
+      <div><label>Thêm sinh viên vào lớp (mã SV)</label><input id="addcode" placeholder="VD: SV0100"></div>
+      <button class="sec" id="addbtn">Thêm</button>
+      <button id="saveall" style="margin-left:auto">💾 Lưu tất cả thay đổi</button>
+    </div>
+    <div data-f="table-slot"></div>
+  </div>
+</template>
+<template id="entry-table-tpl">
+  <div class="table-wrap"><table>
+    <tr><th>Mã SV</th><th>Họ tên</th><th>Chuyên cần</th><th>Giữa kỳ</th><th>Cuối kỳ</th><th class="num">Tổng kết</th><th>Xếp loại</th><th>Kết quả</th><th></th></tr>
+    <tbody data-f="rows"></tbody>
+  </table></div>
+</template>
+<template id="entry-row-tpl">
+  <tr>
+    <td data-f="student_code"></td><td data-f="full_name"></td>
+    <td><input class="sc" data-f="attendance_score"></td>
+    <td><input class="sc" data-f="midterm_score"></td>
+    <td><input class="sc" data-f="final_score"></td>
+    <td class="num tot"><b data-f="total_score"></b></td>
+    <td class="let" data-f="letter_grade"></td>
+    <td class="res"><span class="badge" data-f="result"></span></td>
+    <td><button class="sm save">Lưu</button> <button class="sm danger del" style="display:none">Xóa</button></td>
+  </tr>
+</template>
+<template id="empty-tpl"><div class="empty">Lớp chưa có sinh viên đăng ký.</div></template>
+<template id="empty-offering-tpl"><div class="empty">Không có lớp học phần trong học kỳ này.</div></template>

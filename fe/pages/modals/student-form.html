@@ -1,0 +1,15 @@
+<h2 id="sfm-title"></h2>
+<form id="sform" class="form-grid">
+  <div><label>Mã sinh viên</label><input name="student_code" id="sfm-code"></div>
+  <div><label>Họ tên</label><input name="full_name" required></div>
+  <div><label>Ngày sinh</label><input type="date" name="date_of_birth" required></div>
+  <div><label>Giới tính</label><select name="gender" id="sfm-gender"></select></div>
+  <div><label>Lớp</label><select name="class_id" id="sfm-class"></select></div>
+  <div><label>Năm nhập học</label><input type="number" name="admission_year" required></div>
+  <div><label>Email</label><input name="email" type="email"></div>
+  <div><label>Điện thoại</label><input name="phone"></div>
+  <div class="full"><label>Địa chỉ</label><input name="address"></div>
+  <div><label>Trạng thái</label><select name="status" id="sfm-status"></select></div>
+  <div class="full actions"><button type="button" class="sec" id="cx">Hủy</button><button>Lưu</button></div>
+</form>
+<p class="muted" id="sfm-hint" style="display:none">Tài khoản: tên đăng nhập = mã SV (chữ thường), mật khẩu mặc định student123.</p>

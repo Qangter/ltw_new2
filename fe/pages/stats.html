@@ -1,0 +1,19 @@
+<h1>Thống kê đạt / rớt</h1>
+<div class="grid c4" id="s-stat" style="margin:16px 0"></div>
+<div class="grid c2">
+  <div class="card"><h2>Tỷ lệ đạt theo học kỳ</h2><div id="s-bar-sem"></div></div>
+  <div class="card"><h2>Phân bố điểm chữ</h2><div id="s-bar-dist"></div></div>
+</div>
+<div class="card">
+  <h2>Thống kê theo môn học</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Mã môn</th><th>Tên môn</th><th class="num">Số điểm</th><th class="num">Điểm TB</th><th class="num">Đạt</th><th style="width:220px">Tỷ lệ đạt</th></tr>
+    <tbody id="s-subj-body"></tbody>
+  </table></div>
+</div>
+<template id="subj-row-tpl">
+  <tr>
+    <td data-f="subject_code"></td><td data-f="subject_name"></td><td class="num" data-f="total"></td><td class="num" data-f="avg_score"></td><td class="num" data-f="passed"></td>
+    <td><div class="bar-row" style="grid-template-columns:1fr 50px;margin:0"><div class="bar ok"><i data-f="bar"></i></div><b data-f="rate"></b></div></td>
+  </tr>
+</template>

@@ -1,0 +1,24 @@
+<h1>Tra cứu sinh viên</h1>
+<p class="muted">Tìm theo mã số hoặc họ tên, sau đó xem bảng điểm chi tiết.</p>
+<div class="card">
+  <form class="toolbar" id="sf">
+    <div><label>Mã số / Họ tên</label><input name="q" placeholder="VD: SV0001 hoặc Nguyễn Văn" style="min-width:260px" autofocus></div>
+    <div><label>Lớp</label><select name="class_id" id="sf-class"></select></div>
+    <button>Tìm kiếm</button>
+  </form>
+  <div id="res"></div>
+</div>
+<template id="row-tpl">
+  <tr>
+    <td data-f="student_code"></td><td data-f="full_name"></td><td data-f="class_code"></td><td data-f="major_name"></td><td data-f="department_name"></td>
+    <td><span class="badge" data-f="status"></span></td>
+    <td><a data-f="link"><button class="sm">Xem điểm</button></a></td>
+  </tr>
+</template>
+<template id="table-tpl">
+  <div class="table-wrap"><table>
+    <tr><th>Mã SV</th><th>Họ tên</th><th>Lớp</th><th>Ngành</th><th>Khoa</th><th>Trạng thái</th><th></th></tr>
+    <tbody data-f="rows"></tbody>
+  </table></div>
+</template>
+<template id="empty-tpl"><div class="empty">Không tìm thấy sinh viên phù hợp.</div></template>

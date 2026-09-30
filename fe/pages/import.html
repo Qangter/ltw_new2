@@ -1,0 +1,26 @@
+<h1>Import điểm từ Excel</h1>
+<p class="muted">File .xlsx gồm các cột: student_code, full_name, subject_code, subject_name, credits, semester_name, academic_year, score.</p>
+<div class="card">
+  <button class="sec" id="tpl">⬇ Tải file mẫu</button>
+  <div class="drop" style="margin-top:14px">
+    <input type="file" id="file" accept=".xlsx,.xls">
+    <p class="muted">Hệ thống dùng mã SV, mã môn và tên học kỳ để tìm lớp học phần; giáo viên chỉ import được môn mình dạy. Điểm ghi vào điểm cuối kỳ/tổng kết.</p>
+    <button id="up">Import</button>
+  </div>
+  <div id="ires" style="margin-top:16px"></div>
+</div>
+<template id="import-result-tpl">
+  <div>
+    <div class="grid c4">
+      <div class="stat"><div class="n" data-f="total"></div><div class="l">Tổng dòng</div></div>
+      <div class="stat ok"><div class="n" data-f="created"></div><div class="l">Thêm mới</div></div>
+      <div class="stat warn"><div class="n" data-f="updated"></div><div class="l">Cập nhật</div></div>
+      <div class="stat bad"><div class="n" data-f="failed"></div><div class="l">Lỗi</div></div>
+    </div>
+    <div data-f="errors-wrap" style="display:none">
+      <h2 style="margin-top:16px">Chi tiết lỗi</h2>
+      <div class="table-wrap"><table><tr><th>Dòng</th><th>Lỗi</th></tr><tbody data-f="errors"></tbody></table></div>
+    </div>
+  </div>
+</template>
+<template id="import-error-row-tpl"><tr><td data-f="row"></td><td data-f="message"></td></tr></template>
