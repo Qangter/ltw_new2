@@ -5,7 +5,13 @@ Frontend: HTML/CSS/JavaScript thuần · Backend: Node.js + Express · Database:
 ## Cấu trúc
 ```
 database/   SQL tạo DB + dữ liệu mẫu (500 SV, 25 GV, ~12.000 điểm), verify.sql, Excel mẫu
-be/         Express API (server.js, routes/, middleware/, services/, config/db.js)
+be/         Express API theo MVC
+  routes/       khai báo endpoint và middleware
+  controllers/  xử lý request/response và điều phối nghiệp vụ
+  models/       truy vấn, thao tác dữ liệu MySQL
+  services/     nghiệp vụ dùng chung (ví dụ tính và lưu điểm)
+  middleware/   xác thực, phân quyền và xử lý lỗi request
+  config/       cấu hình kết nối MySQL
 fe/         Giao diện SPA (được Express phục vụ tĩnh)
   index.html      khung trang, chỉ chứa <div id="app">, #toast, #templates
   css/style.css   toàn bộ style
@@ -14,6 +20,8 @@ fe/         Giao diện SPA (được Express phục vụ tĩnh)
   pages/common.html      các <template> dùng chung (thẻ thống kê, thanh tỷ lệ, phân trang)
   pages/modals/*.html    nội dung các hộp thoại (thêm/sửa sinh viên, lịch sử sửa điểm)
 ```
+
+Backend giữ nguyên URL API và hợp đồng request/response; route chuyển request tới controller, controller dùng model để truy cập dữ liệu và service cho nghiệp vụ dùng chung. Các trang HTML trong `fe/pages/` là phần View của giao diện.
 
 ## Cài đặt (Windows)
 1. Tạo database: `mysql -u root -p < database\full_setup.sql`
