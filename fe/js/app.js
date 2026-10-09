@@ -25,8 +25,34 @@ function toast(msg, type = '') {
   setTimeout(() => t.remove(), 3800);
 }
 
+let pendingRequests = 0;
+function setGlobalLoading(active) {
+  let el = $('#global-loading');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'global-loading';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.innerHTML = '<span class="global-loading-spinner" aria-hidden="true"></span><span>Đang đồng bộ dữ liệu</span>';
+    document.body.appendChild(el);
+  }
+  if (active) {
+    pendingRequests += 1;
+    el.hidden = false;
+    requestAnimationFrame(() => el.classList.add('visible'));
+    return;
+  }
+  pendingRequests = Math.max(0, pendingRequests - 1);
+  if (!pendingRequests) {
+    el.classList.remove('visible');
+    setTimeout(() => { if (!pendingRequests) el.hidden = true; }, 180);
+  }
+}
+
 // ---- gọi API backend ----
 async function api(path, { method = 'GET', body, form, raw } = {}) {
+  setGlobalLoading(true);
+  try {
   const headers = {};
   if (token) headers.Authorization = 'Bearer ' + token;
   let payload;
@@ -38,6 +64,9 @@ async function api(path, { method = 'GET', body, form, raw } = {}) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.message || 'Có lỗi xảy ra');
   return data;
+  } finally {
+    setGlobalLoading(false);
+  }
 }
 const qs = (o) => Object.entries(o).filter(([, v]) => v !== '' && v != null).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
 
@@ -119,6 +148,48 @@ function barRow(label, pct, text, cls) {
   const bar = f.querySelector('[data-f="bar"]'); bar.style.width = Math.min(100, pct || 0) + '%';
   setF(f, 'text', text);
   return f;
+}
+function pieChart(items, labelFn, valueFn, colors) {
+  const total = items.reduce((sum, item) => sum + Number(valueFn(item) || 0), 0);
+  const wrap = document.createElement('div');
+  wrap.className = 'pie-layout';
+  if (!total) {
+    wrap.innerHTML = '<div class="empty">Chưa có dữ liệu biểu đồ.</div>';
+    return wrap;
+  }
+
+  let cursor = 0;
+  const stops = items.map((item, index) => {
+    const value = Number(valueFn(item) || 0);
+    const end = cursor + value / total * 100;
+    const color = colors[index % colors.length];
+    const stop = `${color} ${cursor.toFixed(2)}% ${end.toFixed(2)}%`;
+    cursor = end;
+    return { item, value, color, stop };
+  });
+
+  const visual = document.createElement('div');
+  visual.className = 'pie-visual';
+  const chart = document.createElement('div');
+  chart.className = 'pie-chart';
+  chart.style.background = `conic-gradient(${stops.map((s) => s.stop).join(',')})`;
+  const center = document.createElement('div');
+  center.className = 'pie-center';
+  center.innerHTML = `<strong>${num(total)}</strong><span>Tổng</span>`;
+  chart.appendChild(center);
+  visual.appendChild(chart);
+
+  const legend = document.createElement('div');
+  legend.className = 'pie-legend';
+  stops.forEach(({ item, value, color }) => {
+    const row = document.createElement('div');
+    row.className = 'pie-legend-item';
+    row.innerHTML = `<span class="pie-dot" style="background:${color}"></span><span class="pie-label"></span><b>${num(value)} <small>${(value / total * 100).toFixed(1)}%</small></b>`;
+    row.querySelector('.pie-label').textContent = labelFn(item);
+    legend.appendChild(row);
+  });
+  wrap.append(visual, legend);
+  return wrap;
 }
 function renderPager(container, p, onPage) {
   container.innerHTML = '';
@@ -255,10 +326,11 @@ async function vDashboard(v) {
     statCard(o.grades, 'Bản ghi điểm', 'warn'), statCard(num(o.avg_score), 'Điểm trung bình', 'warn'),
     statCard(o.pass_rate + '%', `Tỷ lệ đạt (${o.passed})`, 'ok'), statCard(o.fail_rate + '%', `Tỷ lệ rớt (${o.failed})`, 'bad'),
   );
-  const maxDist = Math.max(...dist.map((d) => d.total), 1), maxDep = Math.max(...dep.map((d) => d.students), 1);
   const bs = $('#bar-semester'); sem.forEach((s) => bs.appendChild(barRow(s.semester_code, s.pass_rate, s.pass_rate + '%', 'ok')));
-  const bd = $('#bar-distribution'); dist.forEach((d) => bd.appendChild(barRow(d.letter_grade, d.total / maxDist * 100, d.total)));
-  const bp = $('#bar-department'); dep.forEach((d) => bp.appendChild(barRow(d.department_name, d.students / maxDep * 100, d.students)));
+  const bd = $('#bar-distribution');
+  bd.replaceChildren(pieChart(dist, (d) => d.letter_grade, (d) => d.total, ['#2563eb', '#3b82f6', '#14b8a6', '#84cc16', '#facc15', '#f97316', '#dc2626', '#7f1d1d']));
+  const bp = $('#bar-department');
+  bp.replaceChildren(pieChart(dep, (d) => d.department_name, (d) => d.students, ['#ef4444', '#f97316', '#facc15', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6']));
 }
 
 // ===================== BẢNG ĐIỂM (dùng chung cho SV xem mình & GV/Admin xem SV) =====================
