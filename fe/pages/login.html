@@ -1,10 +1,20 @@
 <div class="login-wrap">
   <form class="login-card" id="lf">
-    <h1>🎓 Tra cứu kết quả thi</h1>
-    <p class="muted" style="text-align:center;margin-top:0">Đăng nhập để tiếp tục</p>
-    <label>Tên đăng nhập</label><input name="username" autofocus required>
-    <label>Mật khẩu</label><input name="password" type="password" required>
-    <button style="width:100%;margin-top:18px;padding:11px">Đăng nhập</button>
-    <div class="demo"><b>Tài khoản demo</b><br>Admin: admin / admin123<br>Giáo viên: teacher01 / teacher123<br>Sinh viên: student001 / student123</div>
+    <div class="login-brand" aria-hidden="true">🎓</div>
+    <p class="eyebrow">CỔNG HỌC VỤ</p>
+    <h1>Tra cứu kết quả thi</h1>
+    <p class="login-subtitle">Đăng nhập để tiếp tục</p>
+    <div class="login-fields">
+      <div class="login-field">
+        <label for="login-username">Tên đăng nhập</label>
+        <input id="login-username" name="username" autocomplete="username" autofocus required>
+      </div>
+      <div class="login-field">
+        <label for="login-password">Mật khẩu</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+    </div>
+    <button class="login-submit" type="submit">Đăng nhập</button>
+    <div class="demo"><b>Tài khoản demo</b><span>Admin: admin / admin123</span><span>Giáo viên: teacher01 / teacher123</span><span>Sinh viên: student001 / student123</span></div>
   </form>
 </div>

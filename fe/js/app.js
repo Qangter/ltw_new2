@@ -18,6 +18,8 @@ let meta = null;
 function toast(msg, type = '') {
   const t = document.createElement('div');
   t.className = 'toast ' + type;
+  t.setAttribute('role', type === 'err' ? 'alert' : 'status');
+  t.setAttribute('aria-live', type === 'err' ? 'assertive' : 'polite');
   t.textContent = msg;
   $('#toast').appendChild(t);
   setTimeout(() => t.remove(), 3800);
@@ -62,8 +64,11 @@ async function openModal(name) {
   const html = await loadPageHTML('modals/' + name);
   const bg = document.createElement('div');
   bg.className = 'modal-bg';
+  bg.setAttribute('role', 'presentation');
   const box = document.createElement('div');
   box.className = 'modal';
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
   box.innerHTML = html;
   bg.appendChild(box);
   bg.addEventListener('mousedown', (e) => { if (e.target === bg) bg.remove(); });
@@ -149,7 +154,9 @@ function renderPager(container, p, onPage) {
 function loading(el) {
   el.innerHTML = '';
   const d = document.createElement('div');
-  d.className = 'empty';
+  d.className = 'empty loading-state';
+  d.setAttribute('role', 'status');
+  d.setAttribute('aria-live', 'polite');
   d.textContent = 'Đang tải...';
   el.appendChild(d);
 }
@@ -167,6 +174,18 @@ const MENU = [
   ['users', 'Tài khoản', ['ADMIN']],
   ['password', 'Đổi mật khẩu', ['ADMIN', 'TEACHER', 'STUDENT']],
 ];
+const NAV_ICONS = {
+  dashboard: '<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>',
+  my: '<path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/>',
+  lookup: '<circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5M8 10.8h5.6M10.8 8v5.6"/>',
+  entry: '<path d="M4 20h4l10.8-10.8a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4M4 20h4"/>',
+  import: '<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
+  grades: '<path d="M4 5h16v14H4zM4 10h16M9 5v14M15 5v14"/>',
+  stats: '<path d="M4 19V5M4 19h16"/><path d="m7 15 3-4 3 2 5-7"/>',
+  students: '<circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 11a3 3 0 1 0 0-6M16 14a5.5 5.5 0 0 1 4.5 6"/>',
+  users: '<circle cx="12" cy="8" r="3"/><path d="M5 21a7 7 0 0 1 14 0M18 11a3 3 0 1 0 0-6"/>',
+  password: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>'
+};
 // (VIEWS được định nghĩa ở cuối file, sau khi mọi hàm vXxx đã khai báo)
 
 async function render() {
@@ -186,7 +205,13 @@ async function render() {
   items.forEach((m) => {
     const a = document.createElement('a');
     a.href = '#/' + m[0];
-    a.textContent = m[1];
+    const icon = document.createElement('span');
+    icon.className = 'nav-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = `<svg viewBox="0 0 24 24" focusable="false">${NAV_ICONS[m[0]] || ''}</svg>`;
+    const label = document.createElement('span');
+    label.textContent = m[1];
+    a.append(icon, label);
     if (m[0] === activeKey) a.classList.add('active');
     nav.appendChild(a);
   });
