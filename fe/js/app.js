@@ -2,19 +2,27 @@
 'use strict';
 
 // ===================== TIỆN ÍCH CHUNG =====================
+// Hàm rút gọn để tìm phần tử đầu tiên trong DOM.
 const $ = (s, r = document) => r.querySelector(s);
+// Trả về danh sách phần tử phù hợp với selector dưới dạng mảng.
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+// Chuẩn hóa số: làm tròn tối đa 2 chữ số và hiển thị dấu gạch khi không có dữ liệu.
 const num = (n) => (n === null || n === undefined ? '—' : String(Math.round(Number(n) * 100) / 100));
+// Đổi ngày dạng YYYY-MM-DD từ API sang định dạng hiển thị DD/MM/YYYY.
 const fmtDate = (s) => (s ? String(s).slice(0, 10).split('-').reverse().join('/') : '');
+// Các bảng ánh xạ mã nghiệp vụ sang nhãn tiếng Việt.
 const ROLE = { ADMIN: 'Quản trị viên', TEACHER: 'Giáo viên', STUDENT: 'Sinh viên' };
 const RESULT = { PASSED: 'Đạt', FAILED: 'Không đạt' };
 const STATUS = { ACTIVE: 'Đang học', GRADUATED: 'Đã tốt nghiệp', SUSPENDED: 'Bảo lưu/Đình chỉ' };
 const GENDER = { MALE: 'Nam', FEMALE: 'Nữ', OTHER: 'Khác' };
 
+// Khôi phục phiên đăng nhập đã lưu từ lần truy cập trước.
 let token = localStorage.getItem('token');
 let user = JSON.parse(localStorage.getItem('user') || 'null');
+// Metadata dùng chung như học kỳ, môn học, lớp; chỉ gọi API một lần rồi cache.
 let meta = null;
 
+// Tạo thông báo ngắn ở góc màn hình rồi tự động xóa sau vài giây.
 function toast(msg, type = '') {
   const t = document.createElement('div');
   t.className = 'toast ' + type;
@@ -25,7 +33,10 @@ function toast(msg, type = '') {
   setTimeout(() => t.remove(), 3800);
 }
 
+// Đếm số request đang chạy để không tắt loading khi vẫn còn request khác.
 let pendingRequests = 0;
+
+// Hiển thị loading toàn cục trong khi frontend đang chờ API phản hồi.
 function setGlobalLoading(active) {
   let el = $('#global-loading');
   if (!el) {
@@ -49,27 +60,33 @@ function setGlobalLoading(active) {
   }
 }
 
-// ---- gọi API backend ----
+// ---- GỌI API BACKEND ----
+// Hàm trung tâm cho mọi request: gắn JWT, mã hóa body, đọc response và xử lý lỗi.
 async function api(path, { method = 'GET', body, form, raw } = {}) {
   setGlobalLoading(true);
   try {
-  const headers = {};
-  if (token) headers.Authorization = 'Bearer ' + token;
-  let payload;
-  if (form) payload = form;
-  else if (body) { headers['Content-Type'] = 'application/json'; payload = JSON.stringify(body); }
-  const res = await fetch('/api' + path, { method, headers, body: payload });
-  if (res.status === 401 && token) { logout(false); throw new Error('Phiên đăng nhập đã hết hạn'); }
-  if (raw && res.ok) return res.blob();
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || 'Có lỗi xảy ra');
-  return data;
+    const headers = {};
+    if (token) headers.Authorization = 'Bearer ' + token;
+    let payload;
+    // FormData được dùng cho file; body thông thường được gửi dưới dạng JSON.
+    if (form) payload = form;
+    else if (body) { headers['Content-Type'] = 'application/json'; payload = JSON.stringify(body); }
+    const res = await fetch('/api' + path, { method, headers, body: payload });
+    // Token hết hạn thì xóa phiên và đưa người dùng về trạng thái chưa đăng nhập.
+    if (res.status === 401 && token) { logout(false); throw new Error('Phiên đăng nhập đã hết hạn'); }
+    // Một số API trả file nhị phân, ví dụ file mẫu Excel.
+    if (raw && res.ok) return res.blob();
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || 'Có lỗi xảy ra');
+    return data;
   } finally {
     setGlobalLoading(false);
   }
 }
+// Chuyển object query thành chuỗi URL, bỏ qua giá trị rỗng hoặc null.
 const qs = (o) => Object.entries(o).filter(([, v]) => v !== '' && v != null).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
 
+// Xóa thông tin phiên, localStorage và render lại màn hình hiện tại.
 function logout(redirect = true) {
   token = null; user = null; meta = null;
   localStorage.removeItem('token'); localStorage.removeItem('user');
@@ -78,7 +95,9 @@ function logout(redirect = true) {
 }
 
 // ===================== NẠP HTML TỪ FILE (không viết HTML trong .js) =====================
+// Cache nội dung page để không fetch lại cùng một file nhiều lần.
 const pageCache = {};
+// Đọc một file HTML tĩnh trong thư mục pages/.
 async function loadPageHTML(name) {
   if (!pageCache[name]) pageCache[name] = await fetch(`pages/${name}.html`).then((r) => r.text());
   return pageCache[name];
@@ -100,26 +119,31 @@ async function openModal(name) {
   box.setAttribute('aria-modal', 'true');
   box.innerHTML = html;
   bg.appendChild(box);
+  // Click vào vùng nền bên ngoài hộp thoại sẽ đóng modal.
   bg.addEventListener('mousedown', (e) => { if (e.target === bg) bg.remove(); });
   document.body.appendChild(bg);
   return { bg, box };
 }
 
 // ===================== TEMPLATE HELPERS (dùng <template> trong các file .html) =====================
+// Clone nội dung của một thẻ <template> theo id để tạo DOM mới.
 function clone(id) {
   return document.getElementById(id).content.cloneNode(true);
 }
+// Gán textContent cho phần tử có data-f tương ứng, tránh chèn HTML không an toàn.
 function setF(root, field, value) {
   const el = root.querySelector(`[data-f="${field}"]`);
   if (el) el.textContent = value ?? '';
   return el;
 }
+// Gán class badge và nhãn hiển thị theo mã trạng thái/nghiệp vụ.
 function setBadge(root, field, key, map) {
   const el = root.querySelector(`[data-f="${field}"]`);
   if (!el) return;
   el.className = 'badge ' + key;
   el.textContent = (map && map[key]) || key || '';
 }
+// Tạo các option cho select từ một mảng dữ liệu API.
 function fillOptions(select, arr, valueFn, labelFn, selected, placeholder) {
   select.innerHTML = '';
   if (placeholder !== undefined) {
@@ -135,12 +159,14 @@ function fillOptions(select, arr, valueFn, labelFn, selected, placeholder) {
     select.appendChild(o);
   });
 }
+// Dựng một thẻ số liệu từ template stat-tpl.
 function statCard(n, l, cls) {
   const f = clone('stat-tpl');
   if (cls) f.querySelector('.stat').classList.add(cls);
   setF(f, 'n', n); setF(f, 'l', l);
   return f;
 }
+// Dựng một dòng biểu đồ thanh và giới hạn phần trăm tối đa ở 100.
 function barRow(label, pct, text, cls) {
   const f = clone('bar-tpl');
   if (cls) f.querySelector('.bar').classList.add(cls);
@@ -149,7 +175,10 @@ function barRow(label, pct, text, cls) {
   setF(f, 'text', text);
   return f;
 }
+// Dựng biểu đồ donut bằng conic-gradient và legend tương ứng.
+// labelFn/valueFn cho phép tái sử dụng helper cho nhiều loại dữ liệu khác nhau.
 function pieChart(items, labelFn, valueFn, colors) {
+  // Tính tổng trước để quy đổi từng giá trị thành phần trăm của hình tròn.
   const total = items.reduce((sum, item) => sum + Number(valueFn(item) || 0), 0);
   const wrap = document.createElement('div');
   wrap.className = 'pie-layout';
@@ -158,6 +187,7 @@ function pieChart(items, labelFn, valueFn, colors) {
     return wrap;
   }
 
+  // Mỗi phần tử tạo một đoạn màu liên tiếp trên vòng tròn.
   let cursor = 0;
   const stops = items.map((item, index) => {
     const value = Number(valueFn(item) || 0);
@@ -168,6 +198,7 @@ function pieChart(items, labelFn, valueFn, colors) {
     return { item, value, color, stop };
   });
 
+  // Khu vực bên trái chứa donut và tổng số ở chính giữa.
   const visual = document.createElement('div');
   visual.className = 'pie-visual';
   const chart = document.createElement('div');
@@ -179,6 +210,7 @@ function pieChart(items, labelFn, valueFn, colors) {
   chart.appendChild(center);
   visual.appendChild(chart);
 
+  // Khu vực bên phải liệt kê màu, nhãn, số lượng và tỷ lệ phần trăm.
   const legend = document.createElement('div');
   legend.className = 'pie-legend';
   stops.forEach(({ item, value, color }) => {
@@ -191,6 +223,7 @@ function pieChart(items, labelFn, valueFn, colors) {
   wrap.append(visual, legend);
   return wrap;
 }
+// Render điều khiển phân trang và gắn callback cho từng nút trang.
 function renderPager(container, p, onPage) {
   container.innerHTML = '';
   if (!p) return;
@@ -222,6 +255,7 @@ function renderPager(container, p, onPage) {
   container.appendChild(wrap);
   container.querySelectorAll('[data-page]').forEach((b) => b.addEventListener('click', () => onPage(Number(b.dataset.page))));
 }
+// Hiển thị trạng thái loading trong một vùng nội dung cụ thể.
 function loading(el) {
   el.innerHTML = '';
   const d = document.createElement('div');
@@ -233,6 +267,7 @@ function loading(el) {
 }
 
 // ===================== MENU + ROUTER =====================
+// Cấu hình menu: route, nhãn và danh sách role được phép nhìn thấy.
 const MENU = [
   ['dashboard', 'Tổng quan', ['ADMIN', 'TEACHER']],
   ['my', 'Bảng điểm của tôi', ['STUDENT']],
@@ -245,6 +280,7 @@ const MENU = [
   ['users', 'Tài khoản', ['ADMIN']],
   ['password', 'Đổi mật khẩu', ['ADMIN', 'TEACHER', 'STUDENT']],
 ];
+// SVG path cho icon nghiệp vụ của từng route; icon được render ở navbar.
 const NAV_ICONS = {
   dashboard: '<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>',
   my: '<path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/>',
@@ -257,20 +293,25 @@ const NAV_ICONS = {
   users: '<circle cx="12" cy="8" r="3"/><path d="M5 21a7 7 0 0 1 14 0M18 11a3 3 0 1 0 0-6"/>',
   password: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>'
 };
-// (VIEWS được định nghĩa ở cuối file, sau khi mọi hàm vXxx đã khai báo)
+// VIEWS được định nghĩa ở cuối file, sau khi mọi hàm vXxx đã khai báo.
 
+// Router chính của SPA: đọc hash, dựng shell, dựng menu và gọi view tương ứng.
 async function render() {
   const app = $('#app');
+  // Ví dụ #/grades sẽ trở thành route "grades".
   const hash = location.hash.replace(/^#\/?/, '');
   const [route, param] = hash.split('/');
+  // Người chưa đăng nhập chỉ được nhìn thấy màn hình login.
   if (!user) { await renderLogin(app); return; }
   const home = user.role === 'STUDENT' ? 'my' : 'dashboard';
   const page = route && route !== 'login' ? route : home;
+  // Lọc menu theo role để không hiển thị chức năng ngoài quyền.
   const items = MENU.filter((m) => m[2].includes(user.role));
   const activeKey = page === 'student' ? 'lookup' : page;
   if (!items.some((m) => m[0] === activeKey) && page !== 'student') { location.hash = '#/' + home; return; }
   if (page === 'student' && user.role === 'STUDENT') { location.hash = '#/my'; return; }
 
+  // Nạp layout chung trước, sau đó gắn các link menu động.
   await mount(app, 'shell');
   const nav = $('#nav');
   items.forEach((m) => {
@@ -290,22 +331,27 @@ async function render() {
   $('#user-role').textContent = ROLE[user.role];
   $('#logout').addEventListener('click', (e) => { e.preventDefault(); logout(); });
 
+  // Hiển thị loading trong vùng nội dung trước khi view gọi API.
   const view = $('#view');
   loading(view);
   try { await VIEWS[page](view, param); }
   catch (e) { view.innerHTML = ''; const d = document.createElement('div'); d.className = 'card empty'; d.textContent = e.message; view.appendChild(d); }
 }
+// Khi URL hash thay đổi, router render lại view tương ứng.
 window.addEventListener('hashchange', render);
 
+// Lấy metadata dùng chung và ghi nhớ trong biến meta.
 async function ensureMeta() { if (!meta) meta = await api('/meta'); return meta; }
 
 // ===================== ĐĂNG NHẬP =====================
+// Mount form login và đăng ký luồng submit xác thực.
 async function renderLogin(app) {
   await mount(app, 'login');
   $('#lf').addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = new FormData(e.target);
     try {
+      // Gửi username/password đến backend; token và user được lưu để duy trì phiên.
       const r = await api('/auth/login', { method: 'POST', body: { username: f.get('username'), password: f.get('password') } });
       token = r.token; user = r.user;
       localStorage.setItem('token', token); localStorage.setItem('user', JSON.stringify(user));
@@ -316,9 +362,11 @@ async function renderLogin(app) {
 }
 
 // ===================== TỔNG QUAN =====================
+// Tải các chỉ số tổng quan, biểu đồ học kỳ, điểm chữ và khoa.
 async function vDashboard(v) {
   await mount(v, 'dashboard');
   $('#hi-name').textContent = user.full_name;
+  // Gọi song song các endpoint thống kê để giảm thời gian chờ tổng thể.
   const [o, sem, dist, dep] = await Promise.all([api('/stats/overview'), api('/stats/by-semester'), api('/stats/distribution'), api('/stats/by-department')]);
   const grid = $('#stat-grid');
   grid.append(
@@ -326,6 +374,7 @@ async function vDashboard(v) {
     statCard(o.grades, 'Bản ghi điểm', 'warn'), statCard(num(o.avg_score), 'Điểm trung bình', 'warn'),
     statCard(o.pass_rate + '%', `Tỷ lệ đạt (${o.passed})`, 'ok'), statCard(o.fail_rate + '%', `Tỷ lệ rớt (${o.failed})`, 'bad'),
   );
+  // Biểu đồ theo học kỳ vẫn dùng dạng thanh vì phù hợp với chuỗi thời gian.
   const bs = $('#bar-semester'); sem.forEach((s) => bs.appendChild(barRow(s.semester_code, s.pass_rate, s.pass_rate + '%', 'ok')));
   const bd = $('#bar-distribution');
   bd.replaceChildren(pieChart(dist, (d) => d.letter_grade, (d) => d.total, ['#2563eb', '#3b82f6', '#14b8a6', '#84cc16', '#facc15', '#f97316', '#dc2626', '#7f1d1d']));
@@ -334,12 +383,14 @@ async function vDashboard(v) {
 }
 
 // ===================== BẢNG ĐIỂM (dùng chung cho SV xem mình & GV/Admin xem SV) =====================
+// Dùng chung cho bảng điểm của sinh viên hiện tại và bảng điểm tra cứu.
 async function showTranscript(v, loader, canBack) {
   await mount(v, 'transcript');
   const m = await ensureMeta();
   if (canBack) $('#back-link').style.display = '';
   let semId = '';
 
+  // Tải lại bảng điểm mỗi khi người dùng đổi bộ lọc học kỳ.
   async function draw() {
     const d = await loader(semId);
     const s = d.student, sm = d.summary;
@@ -354,6 +405,7 @@ async function showTranscript(v, loader, canBack) {
     setF(profile, 'admission_year', s.admission_year);
     setBadge(profile, 'status', s.status, STATUS);
 
+    // Cập nhật 4 chỉ số tổng hợp ở đầu bảng điểm.
     const stats = $('#t-stats'); stats.innerHTML = '';
     stats.append(
       statCard(num(sm.gpa), 'Điểm TB (thang 10)'), statCard(sm.subjects, 'Số môn đã có điểm'),
@@ -363,6 +415,7 @@ async function showTranscript(v, loader, canBack) {
     fillOptions($('#semf'), m.semesters, (x) => x.id, (x) => x.semester_name, semId, 'Tất cả học kỳ');
 
     const body = $('#t-body'); body.innerHTML = '';
+    // Nhóm các môn theo học kỳ để mỗi học kỳ có một bảng riêng.
     if (!d.grades.length) { body.appendChild(clone('empty-tpl')); }
     else {
       const groups = {};
@@ -388,16 +441,19 @@ async function showTranscript(v, loader, canBack) {
   await draw();
   $('#print').addEventListener('click', () => window.print());
 }
+// Hai view dưới đây chỉ khác endpoint lấy transcript.
 const vMy = (v) => showTranscript(v, (sem) => api('/students/me/transcript?' + qs({ semester_id: sem })), false);
 const vStudent = (v, id) => showTranscript(v, (sem) => api(`/students/${id}/transcript?` + qs({ semester_id: sem })), true);
 
 // ===================== TRA CỨU SINH VIÊN =====================
+// Tìm sinh viên theo mã/tên/lớp và render bảng kết quả phân trang.
 async function vLookup(v) {
   await mount(v, 'lookup');
   const m = await ensureMeta();
   fillOptions($('#sf-class'), m.classes, (c) => c.id, (c) => c.class_code, '', 'Tất cả lớp');
   const f = { q: '', class_id: '', page: 1 };
 
+  // Hàm load được dùng lại khi submit bộ lọc hoặc chuyển trang.
   async function load() {
     const res = $('#res'); loading(res);
     const p = await api('/students?' + qs({ ...f, limit: 10 }));
@@ -428,12 +484,14 @@ async function vLookup(v) {
 }
 
 // ===================== NHẬP ĐIỂM =====================
+// Tải danh sách lớp học phần và cho phép nhập/sửa điểm theo từng sinh viên.
 async function vEntry(v) {
   await mount(v, 'entry');
   const m = await ensureMeta();
   const active = m.semesters.find((s) => s.status === 'ACTIVE') || m.semesters[m.semesters.length - 1];
   fillOptions($('#es'), m.semesters, (s) => s.id, (s) => s.semester_name, active.id);
 
+  // Tải các lớp học phần theo học kỳ đang chọn.
   async function loadOfferings() {
     const offerings = await api('/offerings?' + qs({ semester_id: $('#es').value }));
     fillOptions($('#eo'), offerings, (o) => o.id,
@@ -442,6 +500,7 @@ async function vEntry(v) {
     if (offerings.length) await loadStudents(); else box.appendChild(clone('empty-offering-tpl'));
   }
 
+  // Tải danh sách sinh viên trong lớp học phần và dựng bảng nhập điểm.
   async function loadStudents() {
     const id = $('#eo').value;
     const box = $('#etable'); loading(box);
@@ -470,6 +529,7 @@ async function vEntry(v) {
     }
     box.appendChild(wrap);
 
+    // Lưu một dòng điểm; silent dùng khi lưu hàng loạt để tránh nhiều toast.
     async function saveRow(tr, silent) {
       const body = {};
       tr.querySelectorAll('input').forEach((i) => { body[i.dataset.f] = i.value.trim(); });
@@ -511,8 +571,10 @@ async function vEntry(v) {
 }
 
 // ===================== IMPORT EXCEL =====================
+// Cho phép tải file mẫu và import bảng điểm từ Excel.
 async function vImport(v) {
   await mount(v, 'import');
+  // Tải file template dạng blob rồi tạo link tải tạm thời.
   $('#tpl').addEventListener('click', async () => {
     try {
       const b = await api('/import/template', { raw: true });
@@ -520,6 +582,7 @@ async function vImport(v) {
       a.href = URL.createObjectURL(b); a.download = 'excel_template.xlsx'; a.click();
     } catch (e) { toast(e.message, 'err'); }
   });
+  // Đóng gói file thành FormData và gửi lên API import.
   $('#up').addEventListener('click', async () => {
     const file = $('#file').files[0];
     if (!file) return toast('Vui lòng chọn file Excel', 'err');
@@ -546,6 +609,7 @@ async function vImport(v) {
 }
 
 // ===================== DANH SÁCH ĐIỂM =====================
+// Hiển thị danh sách điểm với bộ lọc, phân trang và lịch sử chỉnh sửa.
 async function vGrades(v) {
   await mount(v, 'grades');
   const m = await ensureMeta();
@@ -553,6 +617,7 @@ async function vGrades(v) {
   fillOptions($('#gf-sub'), m.subjects, (s) => s.id, (s) => `${s.subject_code} - ${s.subject_name}`, '', 'Tất cả');
   const f = { q: '', semester_id: '', subject_id: '', result: '', page: 1 };
 
+  // Tải lại danh sách khi người dùng lọc hoặc chuyển trang.
   async function load() {
     const box = $('#gres'); loading(box);
     const p = await api('/grades?' + qs(f));
@@ -581,6 +646,7 @@ async function vGrades(v) {
     renderPager(pagerBox, p, (n) => { f.page = n; load(); });
   }
 
+  // Mở modal và nạp lịch sử thay đổi điểm của một bản ghi.
   async function showHistory(id) {
     try {
       const h = await api(`/grades/${id}/history`);
@@ -607,8 +673,10 @@ async function vGrades(v) {
 }
 
 // ===================== THỐNG KÊ =====================
+// Tải các thống kê đạt/rớt và bảng thống kê theo môn học.
 async function vStats(v) {
   await mount(v, 'stats');
+  // Các nhóm thống kê độc lập nên được gọi đồng thời.
   const [o, sem, sub, dist] = await Promise.all([api('/stats/overview'), api('/stats/by-semester'), api('/stats/by-subject'), api('/stats/distribution')]);
   $('#s-stat').append(
     statCard(o.pass_rate + '%', `Tỷ lệ đạt (${o.passed} điểm)`, 'ok'), statCard(o.fail_rate + '%', `Tỷ lệ rớt (${o.failed} điểm)`, 'bad'),
@@ -628,6 +696,7 @@ async function vStats(v) {
 }
 
 // ===================== QUẢN LÝ SINH VIÊN (Admin) =====================
+// CRUD sinh viên dành cho role ADMIN: lọc, thêm, sửa và xóa.
 async function vStudents(v) {
   await mount(v, 'students');
   const m = await ensureMeta();
@@ -636,6 +705,7 @@ async function vStudents(v) {
   const f = { q: '', class_id: '', status: '', page: 1 };
   let rows = [];
 
+  // Render lại danh sách sau mỗi thao tác CRUD hoặc đổi trang.
   async function load() {
     const box = $('#stres'); loading(box);
     const p = await api('/students?' + qs({ ...f, limit: 12 })); rows = p.data;
@@ -661,6 +731,7 @@ async function vStudents(v) {
     renderPager(pagerBox, p, (n) => { f.page = n; load(); });
   }
 
+  // Mở form dùng chung cho cả chế độ thêm mới và chỉnh sửa.
   async function openForm(s) {
     const edit = !!s;
     s = s || { gender: 'MALE', status: 'ACTIVE', admission_year: new Date().getFullYear() };
@@ -677,6 +748,7 @@ async function vStudents(v) {
     fillOptions(form.status, Object.entries(STATUS).map(([k, t]) => ({ k, t })), (x) => x.k, (x) => x.t, s.status);
     if (!edit) box.querySelector('#sfm-hint').style.display = '';
     box.querySelector('#cx').addEventListener('click', () => box.closest('.modal-bg').remove());
+    // Submit form sẽ chọn POST hoặc PUT tùy chế độ edit.
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const body = Object.fromEntries(new FormData(form));
@@ -699,11 +771,13 @@ async function vStudents(v) {
 }
 
 // ===================== QUẢN LÝ TÀI KHOẢN (Admin) =====================
+// Quản lý trạng thái tài khoản và reset mật khẩu người dùng.
 async function vUsers(v) {
   await mount(v, 'users');
   fillOptions($('#uf-role'), Object.entries(ROLE).map(([k, t]) => ({ k, t })), (x) => x.k, (x) => x.t, '', 'Tất cả');
   const f = { q: '', role: '', page: 1 };
 
+  // Tải danh sách tài khoản theo bộ lọc role/từ khóa.
   async function load() {
     const box = $('#ures'); loading(box);
     const p = await api('/admin/users?' + qs(f));
@@ -742,17 +816,20 @@ async function vUsers(v) {
 }
 
 // ===================== ĐỔI MẬT KHẨU =====================
+// Kiểm tra xác nhận rồi gửi mật khẩu mới đến backend.
 async function vPassword(v) {
   await mount(v, 'password');
   $('#pf').addEventListener('submit', async (e) => {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(e.target));
+    // Chặn request nếu hai ô mật khẩu mới không trùng nhau.
     if (d.new_password !== d.confirm) return toast('Mật khẩu nhập lại không khớp', 'err');
     try { const r = await api('/auth/change-password', { method: 'POST', body: d }); toast(r.message, 'ok'); e.target.reset(); }
     catch (err) { toast(err.message, 'err'); }
   });
 }
 
+// Bảng ánh xạ route -> hàm view mà router gọi sau khi mount shell.
 const VIEWS = {
   dashboard: vDashboard, my: vMy, lookup: vLookup, student: vStudent, entry: vEntry,
   import: vImport, grades: vGrades, stats: vStats, students: vStudents, users: vUsers, password: vPassword,
@@ -760,12 +837,14 @@ const VIEWS = {
 
 // ===================== KHỞI ĐỘNG =====================
 (async function init() {
-  // nạp các template dùng chung (stat, bar, pager...) vào #templates
+  // Nạp các template dùng chung (stat, bar, pager...) vào #templates.
   const commonHtml = await loadPageHTML('common');
   $('#templates').innerHTML = commonHtml;
   if (token) {
+    // Xác thực lại token và cập nhật thông tin user mới nhất từ server.
     try { user = { ...user, ...(await api('/auth/me')) }; localStorage.setItem('user', JSON.stringify(user)); }
     catch { logout(false); }
   }
+  // Render lần đầu theo trạng thái đăng nhập và hash hiện tại.
   render();
 })();
