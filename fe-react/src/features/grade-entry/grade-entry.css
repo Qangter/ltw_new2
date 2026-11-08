@@ -1,0 +1,8 @@
+.entry-table { min-width: 1100px; }
+.entry-table .score-input { width: 5.5rem; }
+.entry-table small { display: block; white-space: normal; max-width: 10rem; }
+.entry-status { min-width: 9rem; max-width: 17rem; white-space: normal; }
+.entry-table .actions { flex-wrap: wrap; }
+.entry-enroll { margin-top: 1.5rem; }
+.entry-enroll input { width: min(100%, 18rem); }
+.entry-editor > .actions { margin-bottom: 1rem; }

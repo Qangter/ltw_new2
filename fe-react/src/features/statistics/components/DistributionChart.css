@@ -1,0 +1,19 @@
+/* Adapt to the card's width: a wide viewport can still contain narrow chart cards. */
+.pie-layout.statistics-donut {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.statistics-donut > .pie-visual {
+  flex: 0 0 166px;
+}
+
+.statistics-donut > .pie-legend {
+  flex: 1 1 180px;
+}
+
+.statistics-donut .pie-label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

@@ -1,5 +1,4 @@
 require('dotenv').config();
-const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
@@ -16,7 +15,7 @@ app.use('/api', require('./routes/grades')); // meta, offerings, grades, import
 app.use('/api', (req, res) => res.status(404).json({ message: 'API không tồn tại' }));
 
 // Frontend tĩnh
-app.use(express.static(path.join(__dirname, '..', 'fe')));
+app.use(require('./config/frontend').createFrontendMiddleware());
 
 // Xử lý lỗi tập trung
 app.use((err, req, res, next) => {
