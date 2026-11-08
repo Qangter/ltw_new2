@@ -7,7 +7,6 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "start:react": "node scripts/start-frontend.js react",
-    "start:legacy": "node scripts/start-frontend.js legacy",
     "test:frontend": "node --test tests/frontend.test.js",
     "test:frontend:live": "node --test tests/frontend-live.test.js"
   },

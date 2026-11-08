@@ -1,10 +1,12 @@
 # Giải thích luồng hoạt động và các hàm quan trọng trong `app.js`
 
-Tài liệu này diễn giải frontend tại [`fe/js/app.js`](../fe/js/app.js), tập trung vào các hàm tạo nên luồng hoạt động của ứng dụng: khởi động, khôi phục phiên, điều hướng SPA, tải HTML, gọi API, đăng nhập, bảng điểm và nhập điểm. Phần giải thích dựa trên code hiện tại; nó không thay thế kiểm tra quyền ở backend.
+> **Cập nhật 08/11/2026:** Dự án hiện chỉ dùng React. Nội dung mô tả frontend cũ, yêu cầu giữ bản cũ và kết quả rollback bên dưới là hồ sơ lịch sử trước khi gỡ bản cũ, không phải hướng dẫn chạy hiện hành. Xem [README](../README.md), [frontend React](../fe-react/README.md) và [slide React 12–22](./noi-dung-slide-12-22.md). Các liên kết mã frontend cũ trỏ tới commit lưu trữ.
+
+Tài liệu này diễn giải frontend tại [`fe/js/app.js`](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js), tập trung vào các hàm tạo nên luồng hoạt động của ứng dụng: khởi động, khôi phục phiên, điều hướng SPA, tải HTML, gọi API, đăng nhập, bảng điểm và nhập điểm. Phần giải thích dựa trên code hiện tại; nó không thay thế kiểm tra quyền ở backend.
 
 ## 1. Vai trò của `app.js` trong ứng dụng
 
-`app.js` là mã JavaScript chính của giao diện. File không chứa markup của các màn hình; nó tải các khung HTML từ `fe/pages/*.html`, gắn sự kiện, gọi API và đưa dữ liệu phản hồi vào DOM. Trang gốc [`fe/index.html`](../fe/index.html) cung cấp các vùng `#app`, `#toast`, `#templates` và nạp `js/app.js`.
+`app.js` là mã JavaScript chính của giao diện. File không chứa markup của các màn hình; nó tải các khung HTML từ `fe/pages/*.html`, gắn sự kiện, gọi API và đưa dữ liệu phản hồi vào DOM. Trang gốc [`fe/index.html`](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/index.html) cung cấp các vùng `#app`, `#toast`, `#templates` và nạp `js/app.js`.
 
 Ứng dụng là SPA (Single-Page Application): trình duyệt tải một trang khung ban đầu; khi hash URL đổi, JavaScript thay nội dung vùng ứng dụng mà không tải lại toàn bộ trang. Ví dụ `#/entry` chọn màn hình nhập điểm. Các view được liên kết với hàm xử lý trong object `VIEWS` ở cuối file.
 
@@ -272,9 +274,9 @@ API trả 401 khi frontend đang giữ token → `api()` gọi `logout(false)` �
 
 ### File liên quan
 
-- Trang gốc: [`fe/index.html`](../fe/index.html)
-- Template dùng chung: [`fe/pages/common.html`](../fe/pages/common.html)
-- Layout sau đăng nhập: [`fe/pages/shell.html`](../fe/pages/shell.html)
-- Form đăng nhập: [`fe/pages/login.html`](../fe/pages/login.html)
-- Màn hình nhập điểm: [`fe/pages/entry.html`](../fe/pages/entry.html)
+- Trang gốc: [`fe/index.html`](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/index.html)
+- Template dùng chung: [`fe/pages/common.html`](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/common.html)
+- Layout sau đăng nhập: [`fe/pages/shell.html`](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/shell.html)
+- Form đăng nhập: [`fe/pages/login.html`](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/login.html)
+- Màn hình nhập điểm: [`fe/pages/entry.html`](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/entry.html)
 - Router/API phía server: [`be/server.js`](../be/server.js), [`be/routes/`](../be/routes/)

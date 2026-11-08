@@ -16,7 +16,7 @@
 			"group": "build"
 		},
 		{
-			"label": "Backend: start (legacy)",
+			"label": "Backend: start (React)",
 			"type": "shell",
 			"command": "npm.cmd",
 			"args": [

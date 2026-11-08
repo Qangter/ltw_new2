@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { Navigate, matchPath, useLocation } from 'react-router-dom'
-import logo from '../../../../fe/assets/images/logo.png'
+import logo from '../../assets/images/logo.png'
 import { useAuth } from './useAuth.js'
 import { VerificationState } from './AuthGate.jsx'
 import { homeForRole, routeConfig } from '../../app/routeConfig.js'

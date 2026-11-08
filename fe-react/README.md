@@ -1,10 +1,10 @@
-# Frontend React — giai đoạn 8
+# Frontend React
 
-React/Vite JavaScript chạy song song với [frontend cũ](../fe/). Đã có xác thực/phân quyền và các trang đọc: dashboard, thống kê, tra cứu, bảng điểm bản thân/chi tiết, danh sách điểm và lịch sử chỉnh sửa. Các trang đọc dùng API thật; chỉ test dùng fixture. Express chọn frontend qua `FRONTEND=legacy|react`, mặc định legacy.
+React/Vite JavaScript là frontend duy nhất của dự án. Đã có xác thực/phân quyền và các trang đọc: dashboard, thống kê, tra cứu, bảng điểm bản thân/chi tiết, danh sách điểm và lịch sử chỉnh sửa. Các trang đọc dùng API thật; chỉ test dùng fixture. Express luôn phục vụ bản build React; không còn phụ thuộc thư mục frontend cũ.
 
-Giai đoạn 5 có quản trị sinh viên/tài khoản; giai đoạn 6 có nhập/sửa điểm, lưu từng dòng/lưu tất cả, thêm sinh viên vào lớp và xóa điểm. Giai đoạn 7 có tải mẫu/import Excel, phản ánh kết quả từng phần và lỗi dòng từ API. Giai đoạn 8 bổ sung bảo vệ điều hướng khi import pending, cấu hình Express production, kiểm tra build/rollback và ma trận nghiệm thu. Test ghi DB thật vẫn chờ xác định môi trường development/test; không coi fixture là nghiệm thu ghi thật. Xem [nhật ký](../docs/react-migration-progress.md).
+Giai đoạn 5 có quản trị sinh viên/tài khoản; giai đoạn 6 có nhập/sửa điểm, lưu từng dòng/lưu tất cả, thêm sinh viên vào lớp và xóa điểm. Giai đoạn 7 có tải mẫu/import Excel, phản ánh kết quả từng phần và lỗi dòng từ API. Giai đoạn 8 trước đây bổ sung bảo vệ điều hướng khi import pending, cấu hình Express production, kiểm tra build/rollback và ma trận nghiệm thu. Từ 08/11/2026, frontend cũ và cơ chế chuyển về bản cũ đã được gỡ. Test ghi DB thật vẫn chờ xác định môi trường development/test; không coi fixture là nghiệm thu ghi thật. Xem [nhật ký](../docs/react-migration-progress.md).
 
-## Production và rollback
+## Production
 
 Từ root repository:
 
@@ -13,9 +13,9 @@ npm --prefix fe-react run build
 npm --prefix be run start:react -- 3001
 ```
 
-Mở http://localhost:3001/#/login (bỏ `-- 3001` để dùng PORT cấu hình, mặc định 3000). React build gọi `/api` cùng Express; không chạy Vite trong production. Có thể đặt `FRONTEND=react` trong cấu hình backend rồi dùng `npm --prefix be start`. [Static middleware](../be/config/frontend.js) luôn sau API/JSON 404, không có fallback HTML cho URL lạ. Thiếu index build trả 503, mode sai chặn khởi động; index no-cache, asset có hash immutable. Script start có mode chọn rõ ưu tiên hơn biến shell/file `.env`.
+Mở http://localhost:3001/#/login (bỏ `-- 3001` để dùng PORT cấu hình, mặc định 3000). React build gọi `/api` cùng Express; không chạy Vite trong production. Có thể dùng trực tiếp `npm --prefix be start`; biến `FRONTEND` cũ không còn được sử dụng. [Static middleware](../be/config/frontend.js) luôn sau API/JSON 404, không có fallback HTML cho URL lạ. Thiếu index build trả 503 và hướng dẫn build; index no-cache, asset có hash immutable. Script `start:react` hỗ trợ cổng tùy chọn như trước.
 
-Rollback: dừng Express, đặt `FRONTEND=legacy` rồi restart, hoặc `npm --prefix be run start:legacy -- 3001`; reload trang. Giữ nguyên frontend cũ và database. Xem [hướng dẫn root](../README.md).
+Frontend cũ đã được gỡ. Khi cần khôi phục phiên bản trước, dùng commit/bản phát hành đã lưu rồi build lại. Xem [hướng dẫn root](../README.md).
 
 ```powershell
 npm --prefix be run test:frontend
@@ -25,7 +25,7 @@ npm --prefix fe-react run test:e2e:production
 Remove-Item Env:LIVE_AUTH
 ```
 
-`test:frontend` dùng fixture static, không DB. `test:frontend:live` khởi động Express/MySQL thật trên cổng 5192 và kiểm tra rollback bằng HTTP chỉ đọc. [Production Playwright](./playwright.production.config.js) khởi động chính backend ở cổng 5181, phục vụ build đã tạo, tự dừng khi kết thúc; không tái dùng server lạ trên cổng đó. Giữ legacy ở localhost:3000 để đối chiếu. Loại riêng các test bàn component dev `__components`; vẫn chạy modal/form nghiệp vụ, responsive, in, nhập điểm, import và auth trên build. `LIVE_AUTH=1` chỉ bật login/GET/tải mẫu thật, không bật ghi DB. Các thao tác ghi khác trong suite được intercept fixture rõ ràng.
+`test:frontend` dùng fixture static, không DB. `test:frontend:live` khởi động Express/MySQL thật trên cổng 5192 và kiểm tra cả lệnh khởi động mặc định lẫn launcher React bằng HTTP chỉ đọc. [Production Playwright](./playwright.production.config.js) khởi động chính backend ở cổng 5181, phục vụ build đã tạo, tự dừng khi kết thúc; không tái dùng server lạ trên cổng đó. Các ca đọc đối chiếu React trực tiếp với API, không cần giao diện thứ hai. Loại riêng các test bàn component dev `__components`; vẫn chạy modal/form nghiệp vụ, responsive, in, nhập điểm, import và auth trên build. `LIVE_AUTH=1` chỉ bật login/GET/tải mẫu thật, không bật ghi DB. Các thao tác ghi khác trong suite được intercept fixture rõ ràng.
 
 ## Chạy phát triển
 
@@ -50,9 +50,9 @@ Terminal thứ hai, dùng cấu hình backend/database hiện có:
 npm --prefix be start
 ```
 
-Frontend cũ tiếp tục ở http://localhost:3000. Không cần reset hoặc seed lại database. Backend phải kết nối MySQL thành công mới listen. Không đưa thông tin bí mật database vào biến `VITE_*`.
+Backend ở http://localhost:3000 phục vụ API và bản build React nếu đã build. Khi phát triển, Vite phục vụ giao diện từ source nên API vẫn dùng được dù chưa có bản build. Không cần reset hoặc seed lại database. Backend phải kết nối MySQL thành công mới listen. Không đưa thông tin bí mật database vào biến `VITE_*`.
 
-Có thể dùng các task VS Code trong [tasks.json](../.vscode/tasks.json): `React: dev`, `React: build`, `Backend: start (legacy)`. Dừng bằng Ctrl+C hoặc **Tasks: Terminate Task**.
+Có thể dùng các task VS Code trong [tasks.json](../.vscode/tasks.json): `React: dev`, `React: build`, `Backend: start (React)`. Dừng bằng Ctrl+C hoặc **Tasks: Terminate Task**.
 
 ## Proxy API
 
@@ -64,7 +64,7 @@ Kiểm tra read-only sau khi cả hai server đang chạy:
 npm --prefix fe-react run check:proxy
 ```
 
-[Script kiểm tra](./scripts/check-proxy.mjs) xác minh frontend cũ và React đều trả 200; `/api/auth/me` không token trả 401 JSON và API không tồn tại trả 404 JSON giống gọi trực tiếp backend. Script không đăng nhập, không ghi DB và không dùng server giả.
+[Script kiểm tra](./scripts/check-proxy.mjs) xác minh giao diện Vite trả 200; `/api/auth/me` không token trả 401 JSON và API không tồn tại trả 404 JSON giống gọi trực tiếp backend. Script không đăng nhập, không ghi DB và không dùng server giả.
 
 Kiểm tra này chỉ chứng minh kết nối/proxy và hợp đồng lỗi không xác thực; **không chứng minh dữ liệu đã được tích hợp hoặc phân quyền nghiệp vụ đã hoàn tất**.
 
@@ -80,11 +80,11 @@ npm --prefix fe-react run preview
 ```
 
 - Vitest + React Testing Library + jsdom: 143 kiểm tra API client, phiên/race/cache, route/menu, trang đọc, quản trị, nhập điểm, import, phân trang, toast và modal. Transport được mock rõ ràng; không phải nghiệm thu backend. jsdom chỉ shim showModal/close, không giả lập đầy đủ top layer/inert.
-- Playwright: 39 ca fixture, 13 ca backend đọc/xác thực/tải mẫu bật bằng `LIVE_AUTH=1`, 1 ca HTTP production và 1 ca ghi quản trị cần bật riêng. Production đã đạt 47 ca trong cùng một lượt, bỏ qua 1 ca ghi quản trị; 6 ca foundation dev chạy riêng đều đạt. Discovery gồm [e2e](./e2e/) và `src/features/**/tests/browser/*.spec.js`. Có coverage draft/lưu một phần, multipart, Back/Forward, cảnh báo refresh, import đang xử lý, logout đổi người dùng, modal/responsive và print. Cả hai cấu hình dùng 2 worker; kết quả chi tiết trong nhật ký.
+- Playwright: 39 ca fixture, 13 ca backend đọc/xác thực/tải mẫu bật bằng `LIVE_AUTH=1`, 1 ca HTTP production và 1 ca ghi quản trị cần bật riêng. Trong đợt nghiệm thu 06/11/2026, production đã đạt 47 ca trong cùng một lượt, bỏ qua 1 ca ghi quản trị; 6 ca foundation dev chạy riêng đều đạt. Discovery gồm [e2e](./e2e/) và `src/features/**/tests/browser/*.spec.js`. Có coverage draft/lưu một phần, multipart, Back/Forward, cảnh báo refresh, import đang xử lý, logout đổi người dùng, modal/responsive và print. Cả hai cấu hình dùng 2 worker; kết quả chi tiết trong nhật ký.
 - Mặc định Playwright dùng Chrome đã cài. Có thể chọn Edge bằng `$env:PLAYWRIGHT_CHANNEL='msedge'` trong PowerShell trước khi chạy. Chưa kiểm tra Firefox/WebKit.
 - Trên máy không có Chrome/Edge, cài trình duyệt phù hợp hoặc cấu hình channel trong [playwright.config.js](./playwright.config.js). Không tự tải browser trong postinstall.
 - Test output/screenshot/trace nằm ở thư mục bị gitignore, không đưa vào mã nguồn. Trang `__components` chỉ là bàn kiểm tra UI, không phải tính năng nghiệp vụ.
-- Build tạo thư mục `dist/` tự đủ CSS/logo/JS. Preview cổng 4173 dùng để kiểm tra build; production dùng Express với `FRONTEND=react` như hướng dẫn trên.
+- Build tạo thư mục `dist/` tự đủ CSS/logo/JS. Preview cổng 4173 dùng để kiểm tra build; production dùng Express mặc định như hướng dẫn trên.
 - Vite dùng strictPort: nếu cổng 5173/4173/5180 bị chiếm, báo lỗi để tránh kiểm tra nhầm server. Có thể truyền `-- --port <cổng>` khi chạy dev/preview; với check:proxy, đặt `FRONTEND_URL` tương ứng.
 
 ## Tổ chức mã nguồn
@@ -101,7 +101,7 @@ npm --prefix fe-react run preview
 | [src/test](./src/test/) | Setup kiểm thử component |
 | [e2e](./e2e/) | Kiểm thử trình duyệt |
 
-CSS được import từ [style.css gốc](../fe/css/style.css); logo import từ [logo gốc](../fe/assets/images/logo.png). Không sao chép hoặc sửa hai nguồn này. Dev server chỉ mở quyền đọc thêm thư mục frontend cũ; build đóng gói các asset, không fetch template HTML hay chạy script DOM cũ. Source React cần giữ cấu trúc repository này để resolve các import; riêng bản build không cần frontend cũ.
+CSS nền nằm tại [base.css](./src/styles/base.css); logo tại [logo.png](./src/assets/images/logo.png). Hai tài nguyên được chuyển nguyên nội dung vào React, giữ giao diện hiện có. Vite chỉ mở quyền đọc thư mục React và đóng gói CSS/logo/JS vào build; không tải template HTML hay script DOM cũ.
 
 ### Smoke test với backend thật
 
@@ -166,7 +166,7 @@ Giữ đủ 12 route baseline: `#/login`, `#/dashboard`, `#/my`, `#/lookup`, `#/
 ## Phiên, cache và API
 
 - [AuthProvider](./src/features/auth/AuthProvider.jsx) dùng [session store](./src/features/auth/authSession.js) với 3 trạng thái: `verifying`, `anonymous`, `authenticated`. Chỉ `/me` hợp lệ mới cấp user/role, kể cả sau login; không đọc JSON `user` để quyết định quyền.
-- Giữ `localStorage.token` và `localStorage.user` tương thích bản cũ. Storage hỏng/bị chặn không làm crash; khi không lưu được, phiên chỉ tồn tại trong tab và có thông báo. Dev port khác origin nên không tự chia sẻ storage với frontend cũ.
+- Giữ `localStorage.token` và `localStorage.user` tương thích bản cũ. Storage hỏng/bị chặn không làm crash; khi không lưu được, phiên chỉ tồn tại trong tab và có thông báo. Dev port khác origin nên không tự chia sẻ storage với bản production.
 - `/me` lỗi mạng/5xx/403: giữ token, vẫn chặn page, hiện lỗi + nút thử lại/đăng nhập lại. 401 từ request có token: kết thúc phiên và thông báo hết hạn. 401 login: lỗi thông tin đăng nhập; 403 API: giữ phiên, hiện lỗi quyền. Không có refresh-token/logout endpoint.
 - Mỗi ranh giới phiên tạo API client và QueryClient mới; abort request, cancel queries và clear cả query/mutation cache cũ. Kiểm tra signal sau khi nhận/đọc response để response cũ (kể cả 401) không tác động phiên mới. Remount cây UI/toast theo phiên để bỏ draft riêng tư. Storage event token/clear đồng bộ tab khác.
 - [queryKeys](./src/app/queryKeys.js) có prefix session; list/detail chứa đủ filters/page/ID. Quy ước sử dụng và ví dụ ở [services README](./src/services/README.md).

@@ -1,5 +1,7 @@
 # Nội dung thuyết trình báo cáo cuối kỳ
 
+> **Cập nhật 08/11/2026:** Dự án hiện chỉ dùng React. Nội dung mô tả frontend cũ, yêu cầu giữ bản cũ và kết quả rollback bên dưới là hồ sơ lịch sử trước khi gỡ bản cũ, không phải hướng dẫn chạy hiện hành. Xem [README](../README.md), [frontend React](../fe-react/README.md) và [slide React 12–22](./noi-dung-slide-12-22.md). Các liên kết mã frontend cũ trỏ tới commit lưu trữ.
+
 > Căn cứ mã nguồn trong workspace hiện tại. Tên đề tài, thông tin lớp/giảng viên, thời gian triển khai và kết quả kiểm thử chưa được chứng minh bằng code đều được đánh dấu `[CẦN BỔ SUNG]`. README ghi website tra cứu kết quả thi; triển khai thực tế là SPA quản lý/tra cứu điểm với ba vai trò. Schema có 12 bảng, không phải 10. Dự án không có `design-system.css` hay `data.js`; stylesheet là `fe/css/style.css`, dữ liệu trang tải qua API.
 
 ## Dữ kiện đã xác minh

@@ -5,11 +5,14 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { once } = require('node:events');
 
-test('real Express: React build -> restart on same port with legacy rollback', { timeout: 40000 }, async () => {
+test('real Express: default start and explicit React launcher serve the React build', { timeout: 40000 }, async () => {
   const port = '5192';
-  for (const mode of ['react', 'legacy']) {
-    const child = spawn(process.execPath, [path.resolve(__dirname, '../scripts/start-frontend.js'), mode, port], {
+  for (const args of [[path.resolve(__dirname, '../server.js')], [path.resolve(__dirname, '../scripts/start-frontend.js'), 'react', port]]) {
+    const child = spawn(process.execPath, args, {
       stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
+      cwd: path.resolve(__dirname, '..'),
+      // Old local configuration must not bring back the removed frontend.
+      env: { ...process.env, PORT: port, FRONTEND: 'legacy' },
     });
     const exited = once(child, 'exit');
     try {
@@ -27,9 +30,13 @@ test('real Express: React build -> restart on same port with legacy rollback', {
       const page = await fetch(url);
       assert.equal(page.status, 200);
       const html = await page.text();
-      assert.match(html, mode === 'react' ? /\/assets\/index-.*\.js/ : /js\/app\.js/);
-      const assetPath = mode === 'react' ? html.match(/src="(\/assets\/[^\"]+\.js)"/)[1] : '/js/app.js';
+      assert.match(html, /\/assets\/index-.*\.js/);
+      const assetPath = html.match(/src="(\/assets\/[^\"]+\.js)"/)[1];
       assert.equal((await fetch(url + assetPath)).status, 200);
+      for (const asset of html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)) {
+        assert.equal((await fetch(url + asset[1])).status, 200);
+      }
+      assert.equal((await fetch(url + '/js/app.js')).status, 404);
       const denied = await fetch(url + '/api/auth/me');
       assert.equal(denied.status, 401);
       assert.match(denied.headers.get('content-type'), /json/);

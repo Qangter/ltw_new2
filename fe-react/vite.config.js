@@ -3,7 +3,6 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
-const legacyAssets = fileURLToPath(new URL('../fe', import.meta.url))
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, root, '')
@@ -23,8 +22,8 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       strictPort: true,
       proxy,
-      // Reuse only the existing CSS/logo, never serve backend configuration.
-      fs: { allow: [root, legacyAssets] },
+      // Source and assets belong to React; keep backend configuration outside Vite.
+      fs: { allow: [root] },
     },
     preview: { host: '127.0.0.1', port: 4173, strictPort: true, proxy },
     test: {

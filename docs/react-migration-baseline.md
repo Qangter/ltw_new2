@@ -1,5 +1,7 @@
 # Baseline chuyển frontend sang React — giai đoạn 1
 
+> **Cập nhật 08/11/2026:** Dự án hiện chỉ dùng React. Nội dung mô tả frontend cũ, yêu cầu giữ bản cũ và kết quả rollback bên dưới là hồ sơ lịch sử trước khi gỡ bản cũ, không phải hướng dẫn chạy hiện hành. Xem [README](../README.md), [frontend React](../fe-react/README.md) và [slide React 12–22](./noi-dung-slide-12-22.md). Các liên kết mã frontend cũ trỏ tới commit lưu trữ.
+
 Ngày khảo sát: 03/11/2026. Phạm vi: đọc code và lập hợp đồng chuyển đổi, không sửa ứng dụng.
 
 ## 1. Mức độ xác minh và nguồn chuẩn
@@ -14,8 +16,8 @@ Nguồn:
 
 | Nội dung | Nguồn |
 |---|---|
-| Router, màn hình, state, API đang dùng | [app.js](../fe/js/app.js), [pages](../fe/pages/), [index.html](../fe/index.html) |
-| CSS, responsive, in | [style.css](../fe/css/style.css) |
+| Router, màn hình, state, API đang dùng | [app.js](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js), [pages](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/), [index.html](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/index.html) |
+| CSS, responsive, in | [style.css](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/css/style.css) |
 | Mount API/static, lỗi chung | [server.js](../be/server.js) |
 | Auth và role | [routes/auth](../be/routes/auth.js), [middleware/auth](../be/middleware/auth.js), [authController](../be/controllers/authController.js), [userModel](../be/models/userModel.js) |
 | Sinh viên/bảng điểm | [routes/students](../be/routes/students.js), [studentsController](../be/controllers/studentsController.js), [studentModel](../be/models/studentModel.js) |
@@ -30,7 +32,7 @@ Khi README/nhãn giao diện và code khác nhau, ghi lại khác biệt; không
 
 ## 2. Kiến trúc và điều hướng hiện tại
 
-Express mount API trước static frontend, có JSON 404 riêng cho `/api`, rồi phục vụ [fe](../fe/). Server chỉ bắt đầu listen sau khi `SELECT 1` thành công; cổng mặc định 3000, có thể thay bằng cấu hình.
+Express mount API trước static frontend, có JSON 404 riêng cho `/api`, rồi phục vụ [fe](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/). Server chỉ bắt đầu listen sau khi `SELECT 1` thành công; cổng mặc định 3000, có thể thay bằng cấu hình.
 
 Frontend nạp template HTML bằng fetch, cache trong `pageCache`, clone các template và gắn event handler thủ công. Hash đổi thì dựng lại layout. Metadata được cache trong biến toàn cục, xóa khi logout. Bộ lọc/page hiện nằm trong biến cục bộ, không lưu URL. Không có server logout hoặc API refresh token.
 
@@ -261,22 +263,22 @@ Nguồn: [studentModel](../be/models/studentModel.js).
 
 | Nguồn hiện có | Page/component/hook đề xuất | Giai đoạn |
 |---|---|---|
-| [index](../fe/index.html), [shell](../fe/pages/shell.html), render/MENU | AppProviders, AppRouter, AppLayout, Sidebar, route config theo role | 2–3 |
-| api/qs/ensureMeta trong [app.js](../fe/js/app.js) | apiClient, feature services, useMeta, query key helpers | 3–4 |
-| [common](../fe/pages/common.html), clone/setF/setBadge | StatCard, ProgressBar, Badge, Pagination; thay template bằng JSX | 2 |
+| [index](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/index.html), [shell](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/shell.html), render/MENU | AppProviders, AppRouter, AppLayout, Sidebar, route config theo role | 2–3 |
+| api/qs/ensureMeta trong [app.js](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js) | apiClient, feature services, useMeta, query key helpers | 3–4 |
+| [common](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/common.html), clone/setF/setBadge | StatCard, ProgressBar, Badge, Pagination; thay template bằng JSX | 2 |
 | toast/loading/openModal | ToastProvider, LoadingState, EmptyState, ErrorState, Modal, ConfirmDialog | 2 |
-| [login](../fe/pages/login.html), renderLogin/init/logout | LoginPage, AuthProvider, useAuth, ProtectedRoute, RoleGuard | 3 |
-| [password](../fe/pages/password.html), vPassword | ChangePasswordPage, form/mutation | 3 |
-| [dashboard](../fe/pages/dashboard.html), vDashboard | DashboardPage, DonutChartCSS, useOverview/useStats | 4 |
-| [lookup](../fe/pages/lookup.html), vLookup | LookupPage, StudentSearchForm, StudentResultsTable, useStudents | 4 |
-| [transcript](../fe/pages/transcript.html), showTranscript/vMy/vStudent | MyTranscriptPage, StudentTranscriptPage, TranscriptView, SemesterGradeTable, useTranscript | 4 |
-| [grades](../fe/pages/grades.html), [history modal](../fe/pages/modals/grade-history.html), vGrades | GradeListPage, GradeFilters, GradeHistoryModal, useGrades/useGradeHistory | 4 |
-| [stats](../fe/pages/stats.html), vStats | StatisticsPage, SubjectStatsTable, useStats | 4 |
-| [students](../fe/pages/students.html), [form](../fe/pages/modals/student-form.html), vStudents | StudentsPage, StudentFormModal, useStudentMutations | 5 |
-| [users](../fe/pages/users.html), vUsers | UsersPage, UserActions, useUsers/useUserMutations | 5 |
-| [entry](../fe/pages/entry.html), vEntry | GradeEntryPage, OfferingSelector, GradeEntryRow, useGradeDrafts/useGradeMutations | 6 |
-| [import](../fe/pages/import.html), vImport | ImportPage, FilePicker, ImportResult, useGradeImport | 7 |
-| [style.css](../fe/css/style.css), [logo](../fe/assets/images/logo.png) | Styles/assets React, giữ nhận diện và nhãn tiếng Việt | 2, hoàn thiện ở 8 |
+| [login](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/login.html), renderLogin/init/logout | LoginPage, AuthProvider, useAuth, ProtectedRoute, RoleGuard | 3 |
+| [password](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/password.html), vPassword | ChangePasswordPage, form/mutation | 3 |
+| [dashboard](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/dashboard.html), vDashboard | DashboardPage, DonutChartCSS, useOverview/useStats | 4 |
+| [lookup](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/lookup.html), vLookup | LookupPage, StudentSearchForm, StudentResultsTable, useStudents | 4 |
+| [transcript](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/transcript.html), showTranscript/vMy/vStudent | MyTranscriptPage, StudentTranscriptPage, TranscriptView, SemesterGradeTable, useTranscript | 4 |
+| [grades](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/grades.html), [history modal](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/modals/grade-history.html), vGrades | GradeListPage, GradeFilters, GradeHistoryModal, useGrades/useGradeHistory | 4 |
+| [stats](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/stats.html), vStats | StatisticsPage, SubjectStatsTable, useStats | 4 |
+| [students](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/students.html), [form](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/modals/student-form.html), vStudents | StudentsPage, StudentFormModal, useStudentMutations | 5 |
+| [users](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/users.html), vUsers | UsersPage, UserActions, useUsers/useUserMutations | 5 |
+| [entry](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/entry.html), vEntry | GradeEntryPage, OfferingSelector, GradeEntryRow, useGradeDrafts/useGradeMutations | 6 |
+| [import](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/import.html), vImport | ImportPage, FilePicker, ImportResult, useGradeImport | 7 |
+| [style.css](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/css/style.css), [logo](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/assets/images/logo.png) | Styles/assets React, giữ nhận diện và nhãn tiếng Việt | 2, hoàn thiện ở 8 |
 
 Phân chia state:
 
@@ -339,7 +341,7 @@ Các ô chưa đánh dấu là công việc cần kiểm tra khi có React/API t
 
 | ID | Bằng chứng | Ảnh hưởng / chuyển giao |
 |---|---|---|
-| F01 | `showTranscript.draw` trong [app.js](../fe/js/app.js) gắn listener change cho cùng select mỗi lần draw | Có thể nhân số request sau nhiều lần đổi học kỳ; React dùng handler khai báo, không đăng ký lặp |
+| F01 | `showTranscript.draw` trong [app.js](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js) gắn listener change cho cùng select mỗi lần draw | Có thể nhân số request sau nhiều lần đổi học kỳ; React dùng handler khai báo, không đăng ký lặp |
 | F02 | `vLookup.load`, `vGrades.load`, `vStudents.load`: append empty template rồi gọi `renderPager(container, null)`; renderPager xóa container trước return | Empty message bị xóa; tách vùng bảng/empty và pager |
 | F03 | `vEntry.saveRow` chỉ cập nhật total/letter/result, không cập nhật grade ID và nút xóa | Sau tạo điểm mới không xóa ngay được như mong đợi; React nhận response.id |
 | F04 | `vEntry` truy cập active.id khi semesters có thể rỗng | Cần empty state, không đọc thuộc tính undefined |

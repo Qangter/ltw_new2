@@ -15,9 +15,6 @@ async function read(base, pathname) {
 
 try {
   // Real read-only requests. No fake server, token, login, or database writes.
-  const legacy = await read(backend, '/')
-  assert.equal(legacy.status, 200)
-  assert.match(legacy.text, /js\/app\.js/)
   const current = await read(frontend, '/')
   assert.equal(current.status, 200)
   assert.match(current.text, /id="root"/)
@@ -34,7 +31,7 @@ try {
     assert.equal(JSON.parse(proxied.text).message, expectedMessage)
     console.log(`PASS ${pathname}: HTTP ${expectedStatus}, JSON unchanged through proxy`)
   }
-  console.log('PASS legacy frontend and React shell both return HTTP 200')
+  console.log('PASS React shell returns HTTP 200 and API proxy matches the backend')
 } catch (error) {
   console.error(`Proxy check failed: ${error.message}`)
   console.error('Start the existing backend and Vite first. This check does not start or modify either server.')

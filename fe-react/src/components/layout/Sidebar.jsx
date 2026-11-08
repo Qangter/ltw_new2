@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import logo from '../../../../fe/assets/images/logo.png'
+import logo from '../../assets/images/logo.png'
 import { getMenuItems, homeForRole } from '../../app/routeConfig.js'
 import { useAuth } from '../../features/auth/useAuth.js'
 import { Badge } from '../ui/Badge.jsx'

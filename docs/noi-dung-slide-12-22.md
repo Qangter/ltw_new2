@@ -54,7 +54,6 @@ Vế “kiểm tra trước khi đưa về nhánh chính” là định hướng
 | Biến | Chức năng | Giá trị không bí mật / cách dùng |
 |---|---|---|
 | `PORT` | Cổng HTTP của Express | Mẫu: `3000`. |
-| `FRONTEND` | Chọn frontend Express phục vụ | Đặt `react` để phục vụ bản build React; hướng dẫn trình bày dùng `start:react` để chọn rõ mode. |
 | `DB_HOST` | Địa chỉ máy chủ MySQL | Mẫu: `localhost`. |
 | `DB_PORT` | Cổng MySQL | Mẫu: `3306`. |
 | `DB_USER` | Tài khoản kết nối MySQL | Mẫu dùng `root`; quyền thực tế phụ thuộc cấu hình DB. |
@@ -63,7 +62,7 @@ Vế “kiểm tra trước khi đưa về nhánh chính” là định hướng
 | `JWT_SECRET` | Khóa bí mật để ký và xác minh JWT | Thay chuỗi mẫu bằng giá trị riêng; không đưa vào frontend. |
 | `API_PROXY_TARGET` | Đích proxy API của Vite dev/preview | Trong mẫu frontend: `http://localhost:3000`; chỉ dùng phía Vite, không đưa vào bundle trình duyệt. |
 
-Backend dùng dotenv để nạp cấu hình; mysql2 đọc nhóm biến DB; middleware JWT đọc JWT_SECRET. Biến FRONTEND của shell ưu tiên file cấu hình, còn script start chọn mode rõ ràng có mức ưu tiên cao hơn. Không dùng biến `VITE_*` để chứa bí mật DB/JWT.
+Backend dùng dotenv để nạp cấu hình; mysql2 đọc nhóm biến DB; middleware JWT đọc JWT_SECRET. Express luôn phục vụ React; biến FRONTEND cũ không còn được đọc. Script start:react chỉ hỗ trợ chọn cổng chạy. Không dùng biến `VITE_*` để chứa bí mật DB/JWT.
 
 **Nguồn:** `git branch -a`, `git rev-list --left-right --count main...frontend-react`, `git log --merges main frontend-react`; [mẫu môi trường backend](../be/.env.example), [mẫu môi trường frontend](../fe-react/.env.example), [MySQL pool](../be/config/db.js), [Vite config](../fe-react/vite.config.js), [README](../README.md).
 

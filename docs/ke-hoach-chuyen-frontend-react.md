@@ -1,5 +1,7 @@
 # Kế hoạch chuyển frontend sang React — tài liệu giao việc cho AI
 
+> **Cập nhật 08/11/2026:** Dự án hiện chỉ dùng React. Nội dung mô tả frontend cũ, yêu cầu giữ bản cũ và kết quả rollback bên dưới là hồ sơ lịch sử trước khi gỡ bản cũ, không phải hướng dẫn chạy hiện hành. Xem [README](../README.md), [frontend React](../fe-react/README.md) và [slide React 12–22](./noi-dung-slide-12-22.md). Các liên kết mã frontend cũ trỏ tới commit lưu trữ.
+
 ## 1. Mục tiêu và cách sử dụng
 
 Xây dựng lại frontend bằng React, giữ nguyên chức năng, quyền truy cập và kết quả nghiệp vụ hiện tại; đồng thời cải thiện cấu trúc code, quản lý dữ liệu và trải nghiệm thao tác.
@@ -12,12 +14,12 @@ Mỗi giai đoạn có đầu ra riêng và tiêu chí nghiệm thu. Không ch�
 
 ## 2. Các quyết định mặc định
 
-- Xây frontend mới trong thư mục dự kiến `fe-react/`, không ghi đè [frontend hiện tại](../fe/).
+- Xây frontend mới trong thư mục dự kiến `fe-react/`, không ghi đè [frontend hiện tại](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/).
 - Dùng React + Vite + JavaScript/JSX để hạn chế mở rộng phạm vi sang chuyển đổi TypeScript.
 - Dùng React Router cho điều hướng; chọn HashRouter trong lần chuyển đổi này để giữ dạng URL `#/...` và giảm thay đổi cấu hình phục vụ trang. URL sạch bằng BrowserRouter là hạng mục tùy chọn sau này.
 - Dùng TanStack Query cho dữ liệu server, Auth Context cho phiên đăng nhập, state cục bộ cho modal, bộ lọc và bản nháp form. Không đưa Redux vào mặc định.
 - Dùng fetch trong một API client chung; React Hook Form cho các form thông thường. Bảng nhập điểm dùng state bản nháp theo enrollment ID.
-- Tái sử dụng [CSS hiện có](../fe/css/style.css) và logo trước; chỉ cải thiện giao diện sau khi đảm bảo chức năng tương đương. Chưa thêm Tailwind, bộ UI lớn hoặc thư viện biểu đồ nếu không cần.
+- Tái sử dụng [CSS hiện có](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/css/style.css) và logo trước; chỉ cải thiện giao diện sau khi đảm bảo chức năng tương đương. Chưa thêm Tailwind, bộ UI lớn hoặc thư viện biểu đồ nếu không cần.
 - Giữ endpoint, request/response, schema database và công thức nghiệp vụ. Backend vẫn quyết định quyền, điểm tổng kết, xếp loại và GPA.
 - Khi phát triển, Vite proxy `/api` đến Express. Khi chuyển giao bản chạy thật tại giai đoạn 8, Express phục vụ bản build React cùng origin với API.
 - Chọn phiên bản thư viện phù hợp Node thực tế, kiểm tra tài liệu tương ứng và lưu lockfile; không nâng cấp hàng loạt dependency backend.
@@ -81,7 +83,7 @@ Thứ tự mặc định: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8.
 
 **Mục tiêu:** AI hiểu code và nghiệp vụ thực tế trước khi viết React.
 
-Nguồn chính: [app.js](../fe/js/app.js), [các template](../fe/pages/), [routes](../be/routes/), [controllers](../be/controllers/), [gradeService](../be/services/gradeService.js), [server.js](../be/server.js), [README](../README.md).
+Nguồn chính: [app.js](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js), [các template](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/), [routes](../be/routes/), [controllers](../be/controllers/), [gradeService](../be/services/gradeService.js), [server.js](../be/server.js), [README](../README.md).
 
 **Prompt giao việc:**
 

@@ -1,6 +1,17 @@
 # Nhật ký chuyển frontend sang React
 
-## Trạng thái hiện tại
+> **Cập nhật 08/11/2026:** Dự án hiện chỉ dùng React. Nội dung mô tả frontend cũ, yêu cầu giữ bản cũ và kết quả rollback bên dưới là hồ sơ lịch sử trước khi gỡ bản cũ, không phải hướng dẫn chạy hiện hành. Xem [README](../README.md), [frontend React](../fe-react/README.md) và [slide React 12–22](./noi-dung-slide-12-22.md). Các liên kết mã frontend cũ trỏ tới commit lưu trữ.
+
+## 08/11/2026 — chỉ sử dụng frontend React
+
+- Đã gỡ thư mục frontend cũ; chuyển nguyên CSS nền và logo sang [base.css](../fe-react/src/styles/base.css) và [logo.png](../fe-react/src/assets/images/logo.png). SHA-256 của từng tài nguyên khớp với bản trước khi chuyển.
+- React tự chứa tài nguyên; Vite chỉ cho phép đọc thư mục React. Express luôn phục vụ bản build React, không đọc biến FRONTEND; bỏ lệnh start:legacy. Lệnh start và start:react đều được kiểm tra với cấu hình môi trường cũ để bảo đảm không quay về frontend đã gỡ.
+- Các test đọc dữ liệu đối chiếu trực tiếp với API, không cần chạy frontend thứ hai. Cập nhật README, VS Code task và slide 12–30; tài liệu frontend cũ được đánh dấu lịch sử, liên kết tới commit lưu trữ.
+- Kiểm tra sau khi xóa: build thành công; ESLint đạt; Vitest **143/143**; static middleware **1/1**; Express/MySQL thật **1/1** (hai cách khởi động); Playwright production với LIVE_AUTH=1 **47 đạt, 1 bỏ qua**; foundation trên Vite **6/6**.
+- Test static cần chạy ngoài sandbox do thư mục tạm của sandbox không truy cập được. Playwright production hoàn tất với exit code 0 sau khi dừng hai server thử nghiệm bị kẹt ở bước cleanup trong sandbox.
+- Không chạy seed/reset/migration SQL. Các ca thật chỉ đăng nhập, đọc API và tải mẫu; ca ghi quản trị vẫn bỏ qua, thao tác ghi UI dùng fixture. Kết quả này xác nhận việc gỡ frontend cũ, không thay thế nghiệm thu ghi DB thật hoặc các hạn chế backend đã ghi bên dưới.
+
+## Trạng thái tại thời điểm 06/11/2026
 
 Cập nhật: 06/11/2026.
 
@@ -42,7 +53,7 @@ Trạng thái trong nhật ký này là nguồn tiến độ hiện hành. Câu 
 | [react-migration-baseline.md](./react-migration-baseline.md) | Tạo mới tài liệu hợp đồng và checklist |
 | [react-migration-progress.md](./react-migration-progress.md) | Tạo mới nhật ký này |
 
-Không chỉnh [fe](../fe/), [be](../be/), [database](../database/) hoặc tài liệu có sẵn.
+Không chỉnh [fe](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/), [be](../be/), [database](../database/) hoặc tài liệu có sẵn.
 
 ### Kiểm tra và kết quả
 
@@ -76,7 +87,7 @@ Không chỉnh [fe](../fe/), [be](../be/), [database](../database/) hoặc tài 
 ### Phạm vi và quyết định
 
 - Thực hiện đúng 8 yêu cầu giai đoạn 2. Đã đọc kế hoạch, baseline, nhật ký, hướng dẫn repository và git status trước khi sửa.
-- Tạo [fe-react](../fe-react/) độc lập; giữ nguyên code [fe](../fe/), [be](../be/), [database](../database/) và README gốc. Các tài liệu có sẵn khác không bị ghi đè.
+- Tạo [fe-react](../fe-react/) độc lập; giữ nguyên code [fe](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/), [be](../be/), [database](../database/) và README gốc. Các tài liệu có sẵn khác không bị ghi đè.
 - Dùng React 19.3.1, React Router 7.18.5, Vite 8.3.5/plugin-react 6.2.1, Vitest 5.1.0; JavaScript/JSX, HashRouter. Phiên bản chính xác cùng dependency tree được lưu trong lockfile.
 - Node thực tế 22.19.0, npm 10.9.3. engines frontend đặt `^22.13.0 || ^24.0.0 || >=26.0.0` theo yêu cầu chung của công cụ đã chọn. ESLint 9 ban đầu được thay bằng ESLint 10 sau khi xác minh plugin hỗ trợ vì npm đánh dấu bản 9 hết hỗ trợ.
 - Chưa tạo AuthProvider, API client hay QueryClientProvider; các phần này thuộc giai đoạn 3. Không cài TanStack Query/React Hook Form khi chưa dùng, không tạo token/user giả.
@@ -157,7 +168,7 @@ Diễn biến kiểm tra cần lưu để không nhầm kết quả:
 
 ### Phạm vi và quyết định
 
-- Đọc kế hoạch, baseline, nhật ký giai đoạn 2, code auth/backend/router, git status và hướng dẫn repository trước khi sửa. Giữ nguyên các tài liệu/changes có sẵn, gồm tài liệu thuyết trình; không sửa [fe](../fe/), [be](../be/), [database](../database/) hoặc README gốc.
+- Đọc kế hoạch, baseline, nhật ký giai đoạn 2, code auth/backend/router, git status và hướng dẫn repository trước khi sửa. Giữ nguyên các tài liệu/changes có sẵn, gồm tài liệu thuyết trình; không sửa [fe](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/), [be](../be/), [database](../database/) hoặc README gốc.
 - Node 22.19.0/npm 10.9.3; thêm đúng TanStack Query **5.105.3** và React Hook Form **7.91.0**, phiên bản exact và lockfile. Không thêm axios, schema validator, store hoặc UI library khác.
 - Auth session là external store được Auth Context kết nối qua useSyncExternalStore. Tách khỏi component để kiểm thử race/cancel độc lập; tương thích StrictMode setup/cleanup. Không thay hợp đồng API.
 - Chọn QueryClient riêng mỗi phiên thay vì chỉ invalidate cache chung. Abort/cancel/clear chạy trước khi công bố phiên mới; API client giữ token và signal của chính phiên đó, không lấy token mới giữa request.
@@ -422,7 +433,7 @@ npm.cmd --prefix fe-react run dev
 ### Phạm vi và quyết định
 
 - Thực hiện theo yêu cầu giai đoạn 6 mới nhất; việc nghiệm thu ghi thật của giai đoạn 5 vẫn để mở. Đã đọc kế hoạch, baseline phần HP01–03/DIEM01–02, progress, git status, frontend cũ, gradeService, gradesController, gradeModel, utils/grade và kiến trúc React trước khi sửa. Không tìm thấy AGENTS.md. Giữ nguyên các thay đổi có sẵn của giai đoạn 4–5.
-- Không sửa [frontend cũ](../fe/), [backend](../be/), schema, công thức điểm/GPA, quyền, API hay dependency. Không triển khai import/giai đoạn 7–8; không commit/push/deploy.
+- Không sửa [frontend cũ](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/), [backend](../be/), schema, công thức điểm/GPA, quyền, API hay dependency. Không triển khai import/giai đoạn 7–8; không commit/push/deploy.
 - Giữ route hash `#/entry`. Chuyển root từ declarative HashRouter sang createHashRouter/RouterProvider để dùng cơ chế [useBlocker](https://reactrouter.com/7.18.5/api/hooks/useBlocker) được hỗ trợ, kết hợp beforeunload cho refresh/đóng trang. Không tự monkey-patch history hoặc dựng lại router.
 - Giữ chọn học kỳ/lớp trong state trang như baseline. Học kỳ ACTIVE đầu tiên, nếu không có thì học kỳ cuối; chọn lớp đầu. Mỗi lớp có editor riêng, đổi lớp/học kỳ phải xác nhận bỏ draft. Metadata refetch thiếu lựa chọn cũ vẫn giữ context đang sửa để không unmount draft.
 - Mutation không tự retry; một thao tác ghi tại một thời điểm. Lưu tất cả tuần tự, chỉ dòng dirty; khóa bảng trong batch, khóa dòng đang lưu. Các dòng khác được sửa trong lúc lưu một dòng. Phản hồi cũ không xóa chỉnh sửa mới; request GET trước mutation bị cancel trước khi patch cache.
@@ -544,7 +555,7 @@ Chạy/xem: `npm.cmd --prefix be start`, `npm.cmd --prefix fe-react run dev` n�
 - Đọc kế hoạch, baseline (12 route, 27 endpoint, C01–C21, F01–F08 và B01–B04), nhật ký các giai đoạn trước, code liên quan và git status. Không tìm thấy AGENTS.md. Giữ toàn bộ thay đổi có sẵn giai đoạn 4–7; không commit/push/deploy.
 - Checklist trước đủ nền tảng triển khai cấu hình và kiểm tra giai đoạn 8, nhưng chưa đủ nghiệm thu ghi dữ liệu thật. Đã hỏi xác định môi trường localhost development/test; chưa nhận xác nhận nên chỉ login/GET thật, mọi thao tác ghi trong test frontend vẫn là fixture.
 - Backend/MySQL ban đầu chưa listen; đã khởi động task backend legacy ở 3000 và xác nhận kết nối. Chrome đã có. Không thiếu các môi trường này; phần ghi bị chặn bởi chưa xác định môi trường dữ liệu thử, không phải thiếu backend/MySQL/browser.
-- Backend chỉ đổi phần mount static trong [server.js](../be/server.js), thêm cấu hình static, launcher, script/test liên quan. API routes, JSON 404, error handler, controller/model/service, schema, công thức GPA/điểm và quyền không đổi. Không chỉnh [frontend cũ](../fe/) hoặc [database](../database/).
+- Backend chỉ đổi phần mount static trong [server.js](../be/server.js), thêm cấu hình static, launcher, script/test liên quan. API routes, JSON 404, error handler, controller/model/service, schema, công thức GPA/điểm và quyền không đổi. Không chỉnh [frontend cũ](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/) hoặc [database](../database/).
 
 ### Sửa lỗi và hoàn thành
 

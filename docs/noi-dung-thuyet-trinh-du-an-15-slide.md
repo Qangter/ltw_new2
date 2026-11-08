@@ -1,5 +1,7 @@
 # MẪU SLIDE THUYẾT TRÌNH DỰ ÁN WEBSITE
 
+> **Cập nhật 08/11/2026:** Dự án hiện chỉ dùng React. Nội dung mô tả frontend cũ, yêu cầu giữ bản cũ và kết quả rollback bên dưới là hồ sơ lịch sử trước khi gỡ bản cũ, không phải hướng dẫn chạy hiện hành. Xem [README](../README.md), [frontend React](../fe-react/README.md) và [slide React 12–22](./noi-dung-slide-12-22.md). Các liên kết mã frontend cũ trỏ tới commit lưu trữ.
+
 > **Dự án:** Website Tra cứu Kết quả Thi Trực tuyến.  
 > **Ngày trích xuất:** 30/10/2026.  
 > **Căn cứ:** Mã nguồn frontend, backend, schema, dữ liệu SQL mẫu và tài liệu trong repository hiện tại. Nội dung được tổ chức theo đúng 15 slide yêu cầu, có chi tiết kỹ thuật để dùng làm ghi chú thuyết trình.  
@@ -25,9 +27,9 @@ Tên đề tài trên lấy theo tài liệu gốc và tiêu đề website. “C
 
 **Hình minh họa:** Logo sẵn có bên dưới; chèn thêm ảnh trang Tổng quan sau khi đăng nhập.
 
-![Logo dự án](../fe/assets/images/logo.png)
+![Logo dự án](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/assets/images/logo.png)
 
-**Nguồn đối chiếu:** [README dự án](../README.md), [khung trang và tiêu đề website](../fe/index.html), [giao diện đăng nhập](../fe/pages/login.html).
+**Nguồn đối chiếu:** [README dự án](../README.md), [khung trang và tiêu đề website](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/index.html), [giao diện đăng nhập](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/login.html).
 
 ---
 
@@ -92,7 +94,7 @@ Một website có thể minh họa chuỗi nghiệp vụ: **đăng nhập → ch
 - Các trang hiển thị dữ liệu nhất quán sau khi cập nhật hoặc tải lại.
 - Các ca sử dụng chính được kiểm thử theo ba vai trò trước buổi demo.
 
-**Nguồn đối chiếu:** [các route API](../be/routes/), [xử lý giao diện](../fe/js/app.js), [quy tắc điểm](../be/utils/grade.js).
+**Nguồn đối chiếu:** [các route API](../be/routes/), [xử lý giao diện](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js), [quy tắc điểm](../be/utils/grade.js).
 
 ---
 
@@ -179,7 +181,7 @@ flowchart LR
 
 Đây là sơ đồ tóm tắt chức năng theo tác nhân, không phải bản vẽ UML Use Case đầy đủ.
 
-**Nguồn đối chiếu:** [xác thực](../be/controllers/authController.js), [middleware](../be/middleware/auth.js), [controller sinh viên](../be/controllers/studentsController.js), [controller điểm](../be/controllers/gradesController.js), [server](../be/server.js), [CSS](../fe/css/style.css).
+**Nguồn đối chiếu:** [xác thực](../be/controllers/authController.js), [middleware](../be/middleware/auth.js), [controller sinh viên](../be/controllers/studentsController.js), [controller điểm](../be/controllers/gradesController.js), [server](../be/server.js), [CSS](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/css/style.css).
 
 ---
 
@@ -217,7 +219,7 @@ flowchart LR
 
 **Hình minh họa:** Dùng ba thẻ “Tra cứu”, “Quản lý”, “Hỗ trợ”; chèn ảnh bảng nhập điểm và hộp thoại lịch sử.
 
-**Nguồn đối chiếu:** [menu và các view](../fe/js/app.js), [các trang giao diện](../fe/pages/), [nghiệp vụ lưu điểm](../be/services/gradeService.js), [quản lý tài khoản](../be/controllers/adminController.js).
+**Nguồn đối chiếu:** [menu và các view](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js), [các trang giao diện](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/), [nghiệp vụ lưu điểm](../be/services/gradeService.js), [quản lý tài khoản](../be/controllers/adminController.js).
 
 ---
 
@@ -273,7 +275,7 @@ Dấu `^` là khoảng phiên bản khai báo trong manifest, không phải kh�
 
 **Hình minh họa:** Logo HTML5, CSS3, JavaScript, Node.js, Express, MySQL và Git; chỉ dùng các công nghệ thực sự nêu trên.
 
-**Nguồn đối chiếu:** [manifest backend](../be/package.json), [server](../be/server.js), [pool MySQL](../be/config/db.js), [frontend](../fe/js/app.js), [hướng dẫn CSDL](../database/README.md).
+**Nguồn đối chiếu:** [manifest backend](../be/package.json), [server](../be/server.js), [pool MySQL](../be/config/db.js), [frontend](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js), [hướng dẫn CSDL](../database/README.md).
 
 ---
 
@@ -340,7 +342,7 @@ flowchart LR
 
 Có **27 khai báo route API** trong năm module route; endpoint đăng nhập không yêu cầu JWT, các endpoint còn lại có xác thực.
 
-**Nguồn đối chiếu:** [cấu hình server](../be/server.js), [routes](../be/routes/), [middleware](../be/middleware/auth.js), [service](../be/services/gradeService.js), [frontend](../fe/js/app.js).
+**Nguồn đối chiếu:** [cấu hình server](../be/server.js), [routes](../be/routes/), [middleware](../be/middleware/auth.js), [service](../be/services/gradeService.js), [frontend](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js).
 
 ---
 
@@ -518,7 +520,7 @@ sequenceDiagram
 - Trả `total`, `created`, `updated`, `failed`; danh sách lỗi kèm số dòng Excel, tối đa 100 lỗi chi tiết. Số `updated` đếm bản ghi đã tồn tại được xử lý, kể cả tổng điểm không đổi.
 - Các cột họ tên, tên môn, tín chỉ và năm học trong mẫu không được dùng để tự tạo/cập nhật danh mục; sinh viên/môn/học kỳ phải tồn tại trước.
 
-**Nguồn đối chiếu:** [controller điểm và import](../be/controllers/gradesController.js), [service lưu điểm](../be/services/gradeService.js), [hàm tính điểm](../be/utils/grade.js), [model điểm](../be/models/gradeModel.js), [view nhập điểm](../fe/pages/entry.html).
+**Nguồn đối chiếu:** [controller điểm và import](../be/controllers/gradesController.js), [service lưu điểm](../be/services/gradeService.js), [hàm tính điểm](../be/utils/grade.js), [model điểm](../be/models/gradeModel.js), [view nhập điểm](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/entry.html).
 
 ---
 
@@ -560,7 +562,7 @@ sequenceDiagram
 
 **Hình minh họa:** Chèn ảnh thật của trang Tổng quan trên desktop, trang Nhập điểm và trang Bảng điểm trên mobile. Gợi ý chụp ở 1366×768 và 390×844; đây là kích thước đề xuất kiểm tra, chưa phải kết quả đã chụp.
 
-**Nguồn đối chiếu:** [stylesheet](../fe/css/style.css), [layout chung](../fe/pages/shell.html), [các template dùng lại](../fe/pages/common.html), [logic giao diện](../fe/js/app.js).
+**Nguồn đối chiếu:** [stylesheet](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/css/style.css), [layout chung](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/shell.html), [các template dùng lại](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/common.html), [logic giao diện](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js).
 
 ---
 
@@ -652,7 +654,7 @@ Tham số lần lượt là chuyên cần, giữa kỳ và cuối kỳ. Việc c
 
 **Trọng tâm trình bày:** Giải thích một thao tác đi từ view qua API tới transaction, thay vì chỉ đọc tên thư mục. Không đưa giá trị mật khẩu CSDL hay JWT secret thực tế vào slide.
 
-**Nguồn đối chiếu:** [frontend](../fe/js/app.js), [controller sinh viên](../be/controllers/studentsController.js), [service điểm](../be/services/gradeService.js), [utility điểm](../be/utils/grade.js), [hướng dẫn chạy](../README.md).
+**Nguồn đối chiếu:** [frontend](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/js/app.js), [controller sinh viên](../be/controllers/studentsController.js), [service điểm](../be/services/gradeService.js), [utility điểm](../be/utils/grade.js), [hướng dẫn chạy](../README.md).
 
 ---
 
@@ -713,7 +715,7 @@ Tham số lần lượt là chuyên cần, giữa kỳ và cuối kỳ. Việc c
 
 **Hình minh họa:** Chèn 4–6 ảnh thật: đăng nhập, tổng quan, nhập điểm, lịch sử, bảng điểm sinh viên, giao diện mobile. Đường dẫn localhost chỉ truy cập được khi môi trường demo đã chạy; chưa có URL website công khai được xác minh.
 
-**Nguồn đối chiếu:** [tài khoản demo](../README.md), [trang nhập điểm](../fe/pages/entry.html), [trang import](../fe/pages/import.html), [bảng điểm](../fe/pages/transcript.html), [file Excel mẫu](../database/sample_grades.xlsx).
+**Nguồn đối chiếu:** [tài khoản demo](../README.md), [trang nhập điểm](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/entry.html), [trang import](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/import.html), [bảng điểm](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/pages/transcript.html), [file Excel mẫu](../database/sample_grades.xlsx).
 
 ---
 
@@ -814,4 +816,4 @@ Dự án giúp củng cố kỹ năng phân tích, tổ chức mã nguồn, kế
 - Nếu một dòng Excel bị lỗi, các dòng còn lại được xử lý ra sao?
 - Những phần nào cần hoàn thiện trước khi triển khai cho dữ liệu thực tế?
 
-**Nguồn tổng hợp:** [README dự án](../README.md), [mã backend](../be/), [mã frontend](../fe/), [thiết kế và dữ liệu CSDL](../database/).
+**Nguồn tổng hợp:** [README dự án](../README.md), [mã backend](../be/), [mã frontend](https://github.com/Qangter/ltw_new2/blob/086ee19dbab7f6afbe2a85875579f006c23a09a2/fe/), [thiết kế và dữ liệu CSDL](../database/).

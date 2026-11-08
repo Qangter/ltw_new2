@@ -89,7 +89,7 @@ Với các ca có ghi DB, kiểm tra cả HTTP response lẫn dữ liệu sau re
 | 404 | URL `/api/...` không tồn tại | JSON 404 đặt sau các route, trước static frontend | Đã kiểm tra qua proxy và Express thật theo nhật ký |
 | 409 | Trùng mã SV/tài khoản; đăng ký trùng; xóa SV đã có đăng ký/điểm | Catch lỗi SQL trong `create`, `enroll`, `remove` | UI/fixture quản trị đạt; các lỗi ghi DB thật còn chờ nghiệm thu |
 | 500 | Truy vấn hoặc lỗi nội bộ không được ánh xạ riêng | `wrap(...).catch(next)` → handler log lỗi và trả “Lỗi máy chủ” | Có handler và fixture lỗi; chưa có bằng chứng đã gây lỗi DB thật rồi xác minh phục hồi đầy đủ |
-| 503 | Chọn frontend React nhưng thiếu bản build | `createFrontendMiddleware` trả hướng dẫn build/rollback | Static test với thư mục fixture đã kiểm tra; không phá bản build thật |
+| 503 | Thiếu bản build React | `createFrontendMiddleware` trả hướng dẫn build | Static test với thư mục fixture đã kiểm tra; không phá bản build thật |
 | HTTP 200 + `failed/errors` | Một số dòng import sai SV/môn/học kỳ/điểm | Catch từng dòng, rollback dòng đó, thêm row/message; tiếp tục các dòng sau | Fixture partial import đạt; chưa nghiệm thu partial import ghi thật |
 
 **Điểm cần nói chính xác:** Import lỗi theo dòng vẫn có thể trả HTTP 200, kể cả khi mọi dòng thất bại; client phải đọc `failed` và `errors`. Lỗi đầu file như thiếu cột mới kết thúc request với 400. Phản hồi chỉ chứa tối đa 100 chi tiết lỗi, trong khi failed là tổng số dòng thất bại.
@@ -106,10 +106,10 @@ Với các ca có ghi DB, kiểm tra cả HTTP response lẫn dữ liệu sau re
 
 - 143/143 component tests đạt, sử dụng fixture/mock transport.
 - Production E2E: 47 đạt, 1 skip; gồm 33 fixture, 13 ca auth/đọc/tải mẫu thật và 1 ca HTTP production thật.
-- 3/3 static tests và 1/1 rollback Express thật đạt.
+- Đợt 06/11/2026: 3/3 static tests và 1/1 rollback Express thật đạt. Đây là kết quả lịch sử trước khi gỡ frontend cũ; test hiện tại kiểm tra phục vụ React mặc định và launcher React.
 - Đây là kết quả lịch sử, không phải lần chạy lại của tài liệu này. Một handler tồn tại hoặc test fixture đạt không chứng minh tất cả tình huống server/DB thật đã được xử lý thành công.
 
-**Nguồn kết quả:** [ma trận C01–C21 và nhật ký giai đoạn 8](./react-migration-progress.md), [test static](../be/tests/frontend.test.js), [test rollback](../be/tests/frontend-live.test.js), [cấu hình phục vụ frontend](../be/config/frontend.js).
+**Nguồn kết quả:** [ma trận C01–C21 và nhật ký giai đoạn 8](./react-migration-progress.md), [test static](../be/tests/frontend.test.js), [test Express/React hiện tại](../be/tests/frontend-live.test.js), [cấu hình phục vụ frontend](../be/config/frontend.js).
 
 ## Slide 25 — Cài đặt và chạy local
 
@@ -167,7 +167,7 @@ if (-not (Test-Path -LiteralPath '.\be\.env')) {
 }
 ```
 
-Mở file vừa tạo trong editor và chỉnh `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME=diem_thi`; đặt `JWT_SECRET` riêng; chọn `PORT=3000`, **`FRONTEND=react`**. Không dùng lại giá trị mật khẩu mẫu một cách máy móc. Script start:react dưới đây chọn mode React rõ ràng; không giả định file mẫu đã đặt sẵn mode này.
+Mở file vừa tạo trong editor và chỉnh `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME=diem_thi`; đặt `JWT_SECRET` riêng; chọn `PORT=3000`. Express mặc định phục vụ React, không cần biến `FRONTEND`. Không dùng lại giá trị mật khẩu mẫu một cách máy móc. Script start:react dưới đây phục vụ React và hỗ trợ cổng tùy chọn; npm start cũng phục vụ cùng bản build.
 
 ### Bước 5 — Kiểm tra và build frontend
 
