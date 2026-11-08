@@ -12,7 +12,6 @@ export function AppLayout() {
       }}>Đến nội dung chính</a>
       <Sidebar />
       <main className="main" id="main-content" tabIndex={-1}>
-        <p className="migration-notice">Các trang tra cứu và thống kê đã sẵn sàng. Quản trị, nhập điểm và import đang được chuyển đổi.</p>
         {notice && <p role="status">{notice}</p>}
         <Outlet />
       </main>

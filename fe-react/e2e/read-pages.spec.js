@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { mockReadApi } from './read-fixtures.js'
-import { metaFixture, transcriptFixture, transcriptGradeFixture } from '../src/test/readFixtures.js'
+import { transcriptFixture, transcriptGradeFixture } from '../src/test/readFixtures.js'
+import { formatNumber } from '../src/utils/format.js'
 
 async function mockStaff(page) {
   await mockReadApi(page)
@@ -28,6 +29,37 @@ test('lookup URL filters survive pagination, Back/Forward, refresh and transcrip
   await expect(page).toHaveURL(/#\/student\/42$/)
   await page.goForward()
   await expect(page.getByLabel('Mã số / Họ tên')).toHaveValue('new query')
+})
+
+test('grade filters remain unique across apply, pagination, history and reload (fixture)', async ({ page }) => {
+  await mockStaff(page)
+  const errors = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()) })
+  await page.goto('/#/grades?q=old&page=2')
+  const input = page.getByLabel('Mã / tên SV')
+  const table = page.getByRole('table', { name: 'Danh sách điểm' })
+  await expect(table).toBeVisible()
+  for (const value of ['first', 'second']) {
+    await input.fill(value)
+    await page.getByRole('button', { name: 'Lọc', exact: true }).click()
+    await expect(page).toHaveURL(new RegExp(`#/grades\\?q=${value}$`))
+    await expect(input).toHaveCount(1)
+    await expect(page.locator('form.read-filters')).toHaveCount(1)
+    await expect(table).toHaveCount(1)
+    await page.getByRole('button', { name: 'Trang 2', exact: true }).click()
+    await expect(page).toHaveURL(/page=2$/)
+    await expect(input).toHaveCount(1)
+    await page.goBack()
+    await expect(page).not.toHaveURL(/page=2/)
+    await page.goForward()
+    await expect(input).toHaveValue(value)
+    await page.reload()
+    await expect(input).toHaveCount(1)
+    await expect(input).toHaveValue(value)
+    await expect(page.getByRole('button', { name: 'Trang 2', exact: true })).toHaveAttribute('aria-current', 'page')
+  }
+  expect(errors).toEqual([])
 })
 
 test('history modal focus/Escape/restore, no write requests, mobile grades table (fixture)', async ({ page }, testInfo) => {
@@ -69,6 +101,12 @@ test('long transcript keeps every row/column in print media without scroll clipp
   await page.screenshot({ path: testInfo.outputPath('transcript-print-top.png'), animations: 'disabled' })
   await page.getByText('PRINT085', { exact: true }).scrollIntoViewIfNeeded()
   await page.screenshot({ path: testInfo.outputPath('transcript-print-last.png'), animations: 'disabled' })
+  // Exercise Chrome's paginated print engine, in addition to screen print-media checks.
+  const pdf = await page.pdf({ path: testInfo.outputPath('transcript-long.pdf'), preferCSSPageSize: true, printBackground: true })
+  expect(pdf.subarray(0, 5).toString()).toBe('%PDF-')
+  const pageCount = [...pdf.toString('latin1').matchAll(/\/Type\s*\/Page\b/g)].length
+  expect(pageCount).toBeGreaterThan(1)
+  console.log(`PRINT: Chrome generated ${pageCount} pages for 85 rows (fixture)`)
 })
 
 async function rows(locator) {
@@ -117,10 +155,10 @@ test.describe('live read-only parity with legacy frontend', () => {
       await page.goto('/#/lookup?page=2')
       await legacy.goto('http://localhost:3000/#/lookup')
       await legacy.locator('#sf-class').selectOption('')
-      await legacy.locator('.pager button[data-page="2"]').click()
-      await expect(legacy.locator('#res tbody tr').first()).toContainText(list.data[0].student_code)
+      await legacy.locator('.pager').getByRole('button', { name: '2', exact: true }).click()
+      await expect(legacy.locator('#res tbody[data-f="rows"] > tr').first()).toContainText(list.data[0].student_code)
       await expect(page.locator('table tbody tr').first()).toContainText(list.data[0].student_code)
-      expect(await rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#res tbody tr')))
+      expect(await rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#res tbody[data-f="rows"] > tr')))
       const student = list.data[0]
       await page.getByLabel('Mã số / Họ tên').fill(student.student_code)
       await page.getByLabel('Lớp').selectOption(String(student.class_id))
@@ -129,8 +167,8 @@ test.describe('live read-only parity with legacy frontend', () => {
       await legacy.locator('#sf-class').selectOption(String(student.class_id))
       await legacy.locator('#sf button').click()
       await expect(page.locator('table tbody tr')).toHaveCount(1)
-      await expect(legacy.locator('#res tbody tr')).toHaveCount(1)
-      expect(await rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#res tbody tr')))
+      await expect(legacy.locator('#res tbody[data-f="rows"] > tr')).toHaveCount(1)
+      expect(await rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#res tbody[data-f="rows"] > tr')))
       await page.goto(`/#/student/${student.id}`)
       await legacy.goto(`http://localhost:3000/#/student/${student.id}`)
       for (const semester of ['', String(meta.semesters[0].id)]) {
@@ -140,18 +178,21 @@ test.describe('live read-only parity with legacy frontend', () => {
         await legacy.locator('#semf').selectOption(semester)
         const transcript = await api(`/api/students/${student.id}/transcript?semester_id=${semester}`)
         await expect(page.locator('.transcript-table tbody tr')).toHaveCount(transcript.grades.length)
-        await expect(legacy.locator('#t-body tbody tr')).toHaveCount(transcript.grades.length)
+        await expect(legacy.locator('#t-body tbody[data-f="rows"] > tr')).toHaveCount(transcript.grades.length)
         await expect.poll(() => page.locator('.transcript-summary .n').allTextContents()).toEqual(await legacy.locator('#t-stats .n').allTextContents())
-        expect(await rows(page.locator('.transcript-table tbody tr'))).toEqual(await rows(legacy.locator('#t-body tbody tr')))
+        expect(await rows(page.locator('.transcript-table tbody tr'))).toEqual(await rows(legacy.locator('#t-body tbody[data-f="rows"] > tr')))
       }
       await page.goto('/#/grades?page=2')
       await legacy.goto('http://localhost:3000/#/grades')
-      await legacy.locator('.pager button[data-page="2"]').click()
+      await legacy.locator('.pager').getByRole('button', { name: '2', exact: true }).click()
       const gradePage = await api('/api/grades?page=2&limit=15')
       await expect(page.locator('table tbody tr')).toHaveCount(gradePage.data.length)
-      await expect(legacy.locator('#gres tbody tr').first()).toContainText(gradePage.data[0].student_code)
-      await expect.poll(() => rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#gres tbody tr')))
-      const selected = gradePage.data[0]
+      await expect(legacy.locator('#gres tbody[data-f="rows"] > tr').first()).toContainText(gradePage.data[0].student_code)
+      await expect.poll(() => rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#gres tbody[data-f="rows"] > tr')))
+      // Bounded read-only sampling for a real history, never seed/edit grades to make this test pass.
+      const selected = gradePage.data.find((grade) => Number(grade.edits) > 0)
+        || (await api('/api/grades?page=1&limit=100')).data.find((grade) => Number(grade.edits) > 0)
+        || gradePage.data[0]
       const semester = meta.semesters.find((item) => item.semester_name === selected.semester_name)
       const subject = meta.subjects.find((item) => item.subject_code === selected.subject_code)
       await page.getByLabel('Mã / tên SV').fill(selected.student_code)
@@ -163,8 +204,8 @@ test.describe('live read-only parity with legacy frontend', () => {
       await legacy.locator('#gf-sem').selectOption(String(semester.id)); await legacy.locator('#gf-sub').selectOption(String(subject.id))
       await legacy.locator('#gf select[name="result"]').selectOption(selected.result); await legacy.locator('#gf button').click()
       await expect(page.locator('table tbody tr')).toHaveCount(1)
-      await expect(legacy.locator('#gres tbody tr')).toHaveCount(1)
-      expect(await rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#gres tbody tr')))
+      await expect(legacy.locator('#gres tbody[data-f="rows"] > tr')).toHaveCount(1)
+      expect(await rows(page.locator('table tbody tr'))).toEqual(await rows(legacy.locator('#gres tbody[data-f="rows"] > tr')))
       if (Number(selected.edits) > 0) {
         await page.getByRole('button', { name: `Lịch sử ${selected.student_code} ${selected.subject_code}` }).click()
         await legacy.locator('#gres .hist').click()
@@ -174,8 +215,19 @@ test.describe('live read-only parity with legacy frontend', () => {
         const actual = await rows(page.getByRole('dialog').locator('tbody tr'))
         const old = await rows(legacy.locator('#hist-body tr'))
         expect(actual.map((row) => [row[0], row[3], row[4]])).toEqual(old.map((row) => [row[0], row[3], row[4]]))
+        // React additionally displays old/new result badges; compare all values to the API.
+        const resultLabel = (value) => ({ PASSED: 'Đạt', FAILED: 'Không đạt' }[value] || value || '—')
+        expect(actual).toEqual(history.map((row) => [row.changed_at,
+          `${formatNumber(row.old_score)}${resultLabel(row.old_result)}`,
+          `${formatNumber(row.new_score)}${resultLabel(row.new_result)}`,
+          row.changed_by || '', row.reason]))
+        expect(old.map((row) => row.slice(1, 3))).toEqual(history.map((row) => [formatNumber(row.old_score), formatNumber(row.new_score)]))
         console.log(`LIVE ${username}: compared ${history.length} history rows; read-only`)
-      } else console.log(`LIVE ${username}: selected grade has no edits; populated history covered by fixture only`)
+      } else {
+        expect(await api(`/api/grades/${selected.id}/history`)).toEqual([])
+        await expect(page.getByRole('button', { name: /^Lịch sử / })).toHaveCount(0)
+        console.log(`LIVE ${username}: sampled grades have no edits; empty history API verified, populated modal covered by fixture only`)
+      }
       await legacy.close()
     })
   }
@@ -191,8 +243,8 @@ test.describe('live read-only parity with legacy frontend', () => {
       await legacy.locator('#semf').selectOption(semester)
       const data = await api(`/api/students/me/transcript?semester_id=${semester}`)
       await expect(page.locator('.transcript-table tbody tr')).toHaveCount(data.grades.length)
-      await expect(legacy.locator('#t-body tbody tr')).toHaveCount(data.grades.length)
-      expect(await rows(page.locator('.transcript-table tbody tr'))).toEqual(await rows(legacy.locator('#t-body tbody tr')))
+      await expect(legacy.locator('#t-body tbody[data-f="rows"] > tr')).toHaveCount(data.grades.length)
+      expect(await rows(page.locator('.transcript-table tbody tr'))).toEqual(await rows(legacy.locator('#t-body tbody[data-f="rows"] > tr')))
       expect(await page.locator('.transcript-summary .n').allTextContents()).toEqual(await legacy.locator('#t-stats .n').allTextContents())
     }
     await page.goto('/#/student/42')

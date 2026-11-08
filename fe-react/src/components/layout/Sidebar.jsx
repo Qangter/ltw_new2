@@ -3,6 +3,7 @@ import logo from '../../../../fe/assets/images/logo.png'
 import { getMenuItems, homeForRole } from '../../app/routeConfig.js'
 import { useAuth } from '../../features/auth/useAuth.js'
 import { Badge } from '../ui/Badge.jsx'
+import { useLeaveGuard } from '../../app/LeaveGuardContext.js'
 
 const icons = {
   dashboard: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
@@ -17,6 +18,7 @@ const icons = {
 
 export function Sidebar() {
   const { user, logout } = useAuth()
+  const { requestLeave } = useLeaveGuard()
   const role = user?.role
   const { pathname } = useLocation()
   return (
@@ -37,7 +39,7 @@ export function Sidebar() {
       </nav>
       <div className="userbox">
         <div><b>{user?.full_name || user?.username}</b><span className="sidebar-note"><Badge value={role} /></span></div>
-        <button type="button" onClick={() => logout()}>Đăng xuất</button>
+        <button type="button" onClick={() => requestLeave(() => logout())}>Đăng xuất</button>
         {import.meta.env.DEV && <Link to="/__components">Kiểm tra component</Link>}
       </div>
     </aside>

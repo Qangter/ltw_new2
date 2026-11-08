@@ -13,6 +13,7 @@ export const overviewFixture = { students: 100, teachers: 10, subjects: 8, class
 export function readFixture(url) {
   const { pathname, searchParams } = new URL(url, 'http://test.local')
   if (pathname === '/api/meta') return metaFixture
+  if (pathname === '/api/offerings') return []
   if (pathname === '/api/students') return { data: [studentFixture], total: 21, page: Number(searchParams.get('page') || 1), limit: 10, pages: 3 }
   if (/^\/api\/students\/[^/]+\/transcript$/.test(pathname)) return transcriptFixture
   if (pathname === '/api/grades') return { data: [gradeFixture], total: 31, page: Number(searchParams.get('page') || 1), limit: 15, pages: 3 }

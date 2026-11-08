@@ -3,7 +3,14 @@
   "version": "1.0.0",
   "description": "Website tra cứu kết quả thi trực tuyến - Backend Express + MySQL",
   "main": "server.js",
-  "scripts": { "start": "node server.js", "dev": "node --watch server.js" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "start:react": "node scripts/start-frontend.js react",
+    "start:legacy": "node scripts/start-frontend.js legacy",
+    "test:frontend": "node --test tests/frontend.test.js",
+    "test:frontend:live": "node --test tests/frontend-live.test.js"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

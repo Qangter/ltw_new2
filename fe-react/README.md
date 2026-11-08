@@ -1,6 +1,31 @@
-# Frontend React — giai đoạn 3
+# Frontend React — giai đoạn 8
 
-React/Vite JavaScript chạy độc lập với [frontend cũ](../fe/). Đã có đăng nhập, khôi phục phiên qua `/api/auth/me`, logout, đổi mật khẩu và guard/menu theo role. **Các trang nghiệp vụ giai đoạn 4–7 vẫn là placeholder**, không giả dữ liệu. Express vẫn phục vụ frontend cũ.
+React/Vite JavaScript chạy song song với [frontend cũ](../fe/). Đã có xác thực/phân quyền và các trang đọc: dashboard, thống kê, tra cứu, bảng điểm bản thân/chi tiết, danh sách điểm và lịch sử chỉnh sửa. Các trang đọc dùng API thật; chỉ test dùng fixture. Express chọn frontend qua `FRONTEND=legacy|react`, mặc định legacy.
+
+Giai đoạn 5 có quản trị sinh viên/tài khoản; giai đoạn 6 có nhập/sửa điểm, lưu từng dòng/lưu tất cả, thêm sinh viên vào lớp và xóa điểm. Giai đoạn 7 có tải mẫu/import Excel, phản ánh kết quả từng phần và lỗi dòng từ API. Giai đoạn 8 bổ sung bảo vệ điều hướng khi import pending, cấu hình Express production, kiểm tra build/rollback và ma trận nghiệm thu. Test ghi DB thật vẫn chờ xác định môi trường development/test; không coi fixture là nghiệm thu ghi thật. Xem [nhật ký](../docs/react-migration-progress.md).
+
+## Production và rollback
+
+Từ root repository:
+
+```powershell
+npm --prefix fe-react run build
+npm --prefix be run start:react -- 3001
+```
+
+Mở http://localhost:3001/#/login (bỏ `-- 3001` để dùng PORT cấu hình, mặc định 3000). React build gọi `/api` cùng Express; không chạy Vite trong production. Có thể đặt `FRONTEND=react` trong cấu hình backend rồi dùng `npm --prefix be start`. [Static middleware](../be/config/frontend.js) luôn sau API/JSON 404, không có fallback HTML cho URL lạ. Thiếu index build trả 503, mode sai chặn khởi động; index no-cache, asset có hash immutable. Script start có mode chọn rõ ưu tiên hơn biến shell/file `.env`.
+
+Rollback: dừng Express, đặt `FRONTEND=legacy` rồi restart, hoặc `npm --prefix be run start:legacy -- 3001`; reload trang. Giữ nguyên frontend cũ và database. Xem [hướng dẫn root](../README.md).
+
+```powershell
+npm --prefix be run test:frontend
+npm --prefix be run test:frontend:live
+$env:LIVE_AUTH='1'
+npm --prefix fe-react run test:e2e:production
+Remove-Item Env:LIVE_AUTH
+```
+
+`test:frontend` dùng fixture static, không DB. `test:frontend:live` khởi động Express/MySQL thật trên cổng 5192 và kiểm tra rollback bằng HTTP chỉ đọc. [Production Playwright](./playwright.production.config.js) khởi động chính backend ở cổng 5181, phục vụ build đã tạo, tự dừng khi kết thúc; không tái dùng server lạ trên cổng đó. Giữ legacy ở localhost:3000 để đối chiếu. Loại riêng các test bàn component dev `__components`; vẫn chạy modal/form nghiệp vụ, responsive, in, nhập điểm, import và auth trên build. `LIVE_AUTH=1` chỉ bật login/GET/tải mẫu thật, không bật ghi DB. Các thao tác ghi khác trong suite được intercept fixture rõ ràng.
 
 ## Chạy phát triển
 
@@ -54,24 +79,24 @@ npm --prefix fe-react run build
 npm --prefix fe-react run preview
 ```
 
-- Vitest + React Testing Library + jsdom: 46 kiểm tra API client, phiên/race/cache, route/menu 3 role, login/password, phân trang, toast và modal. Transport được mock rõ ràng; không phải nghiệm thu backend. jsdom chỉ shim showModal/close, không giả lập đầy đủ top layer/inert.
-- Playwright mặc định: 9 kiểm tra UI với auth fixture, 5 ca backend thật được skip. Kiểm tra URL hash/Back/refresh, guard, login/password/logout, logout giữa hai tab, modal focus và viewport 360/768/1280px. Vite cổng 5180 dùng mode/cache E2E riêng; chạy 2 worker để hạn chế quá tải Chrome local.
+- Vitest + React Testing Library + jsdom: 143 kiểm tra API client, phiên/race/cache, route/menu, trang đọc, quản trị, nhập điểm, import, phân trang, toast và modal. Transport được mock rõ ràng; không phải nghiệm thu backend. jsdom chỉ shim showModal/close, không giả lập đầy đủ top layer/inert.
+- Playwright: 39 ca fixture, 13 ca backend đọc/xác thực/tải mẫu bật bằng `LIVE_AUTH=1`, 1 ca HTTP production và 1 ca ghi quản trị cần bật riêng. Production đã đạt 47 ca trong cùng một lượt, bỏ qua 1 ca ghi quản trị; 6 ca foundation dev chạy riêng đều đạt. Discovery gồm [e2e](./e2e/) và `src/features/**/tests/browser/*.spec.js`. Có coverage draft/lưu một phần, multipart, Back/Forward, cảnh báo refresh, import đang xử lý, logout đổi người dùng, modal/responsive và print. Cả hai cấu hình dùng 2 worker; kết quả chi tiết trong nhật ký.
 - Mặc định Playwright dùng Chrome đã cài. Có thể chọn Edge bằng `$env:PLAYWRIGHT_CHANNEL='msedge'` trong PowerShell trước khi chạy. Chưa kiểm tra Firefox/WebKit.
 - Trên máy không có Chrome/Edge, cài trình duyệt phù hợp hoặc cấu hình channel trong [playwright.config.js](./playwright.config.js). Không tự tải browser trong postinstall.
 - Test output/screenshot/trace nằm ở thư mục bị gitignore, không đưa vào mã nguồn. Trang `__components` chỉ là bàn kiểm tra UI, không phải tính năng nghiệp vụ.
-- Build tạo thư mục `dist/` tự đủ CSS/logo/JS. Preview cổng 4173 dùng để kiểm tra build, không phải triển khai production. Express **chưa** phục vụ bản build React; việc đó thuộc giai đoạn 8.
+- Build tạo thư mục `dist/` tự đủ CSS/logo/JS. Preview cổng 4173 dùng để kiểm tra build; production dùng Express với `FRONTEND=react` như hướng dẫn trên.
 - Vite dùng strictPort: nếu cổng 5173/4173/5180 bị chiếm, báo lỗi để tránh kiểm tra nhầm server. Có thể truyền `-- --port <cổng>` khi chạy dev/preview; với check:proxy, đặt `FRONTEND_URL` tương ứng.
 
 ## Tổ chức mã nguồn
 
 | Thư mục | Vai trò |
 |---|---|
-| [src/app](./src/app/) | App, providers, HashRouter, cấu hình route/menu |
+| [src/app](./src/app/) | App, providers, createHashRouter/RouterProvider, cấu hình route/menu và guard đăng xuất |
 | [src/components](./src/components/) | Layout, Card/Badge/Pagination, feedback và overlay |
-| [src/features](./src/features/) | Page riêng theo tính năng; component/hook nghiệp vụ sẽ được thêm tại feature tương ứng khi chuyển trang |
+| [src/features](./src/features/) | Page, component, service/query hook theo feature; dashboard dùng chung hook/component thống kê |
 | [src/services](./src/services/) | Fetch client chung và hợp đồng dùng service/query |
-| [src/hooks](./src/hooks/) | Hook dùng chung, hiện có useToast |
-| [src/utils](./src/utils/) | Hàm thuần dùng chung, hiện có pagination |
+| [src/hooks](./src/hooks/) | useToast, useMeta, useRouteFilters |
+| [src/utils](./src/utils/) | Phân trang và định dạng ngày/số; không tính lại GPA |
 | [src/styles](./src/styles/) | Import CSS gốc và bổ sung style React/responsive/accessibility |
 | [src/test](./src/test/) | Setup kiểm thử component |
 | [e2e](./e2e/) | Kiểm thử trình duyệt |
@@ -88,7 +113,44 @@ npm.cmd --prefix fe-react run test:e2e
 Remove-Item Env:LIVE_AUTH
 ```
 
-5 ca thật dùng tài khoản demo đã được README gốc công bố: admin/admin123, teacher01/teacher123, student001/student123; kiểm tra login, `/me`, refresh, logout, guard và GET admin trả 403, mật khẩu sai, token không hợp lệ. Không ghi dữ liệu hoặc đổi mật khẩu. Nếu dữ liệu development đã thay credentials, cần cấu hình test tương ứng; **không seed/reset** để chạy test. Lần chạy 04/11/2026 đạt 14/14 (9 fixture + 5 thật). Đổi mật khẩu thành công mới kiểm tra bằng fixture, chưa ghi vào tài khoản thật.
+13 ca thật dùng tài khoản demo đã được README gốc công bố: admin/admin123, teacher01/teacher123, student001/student123. Gồm 5 ca xác thực, 3 ca đối chiếu trang đọc React/API/giao diện cũ, 2 ca đọc lớp nhập điểm và 3 ca tải mẫu/quyền template. Không ghi dữ liệu hoặc đổi mật khẩu. Nếu credentials đã thay, cần cấu hình test tương ứng; **không seed/reset** để chạy test. Các ca đối chiếu cần frontend cũ ở `http://localhost:3000` và dữ liệu đủ trang 2. Lịch sử chọn trong trang đang kiểm tra hoặc tối đa 100 bản ghi gần nhất; nếu không có edits thì xác minh API rỗng và ghi rõ modal có dữ liệu mới được kiểm tra bằng fixture.
+
+## Các trang đọc giai đoạn 4
+
+- ADMIN/TEACHER: `#/dashboard`, `#/stats`, `#/lookup`, `#/student/:id`, `#/grades`. STUDENT: `#/my`; không được mở bảng điểm người khác hay trang thống kê.
+- [useRouteFilters](./src/hooks/useRouteFilters.js) lưu bộ lọc đã áp dụng/page trong query string của hash. Submit bộ lọc reset page; Back/Forward/refresh khôi phục giá trị. Bản nháp đang nhập không bị refetch nền ghi đè.
+- [TranscriptView](./src/features/transcripts/TranscriptView.jsx) dùng chung cho bản thân và staff; [service](./src/features/transcripts/transcriptService.js) chọn `/api/students/me/transcript` hoặc `/api/students/:id/transcript`. Summary/GPA lấy từ API theo học kỳ, không tính lại ở client.
+- Service/query hook riêng cho [tra cứu](./src/features/lookup/), [điểm và lịch sử](./src/features/grades/), [bảng điểm](./src/features/transcripts/), [thống kê](./src/features/statistics/). Query key có phiên, tài nguyên, ID/bộ lọc/page; request nhận AbortSignal.
+- [QueryState](./src/components/feedback/QueryState.jsx) phân biệt tải lần đầu, refetch nền, lỗi đầu/lỗi làm mới; từng page có empty state. Dữ liệu cache còn hiển thị khi refetch lỗi kèm cảnh báo và nút thử lại.
+- Nút **In bảng điểm** dùng trình duyệt; CSS A4 ngang ẩn sidebar, nút/bộ lọc/toast, bỏ giới hạn cuộn và cho bảng xuống trang. Đã kiểm tra print media fixture 85 dòng/10 cột, ảnh đầu/cuối và Chrome xuất PDF 7 trang. Chưa kiểm tra trực quan từng trang PDF, hộp thoại in hệ điều hành, máy in vật lý hoặc Firefox/WebKit.
+
+## Quản trị giai đoạn 5
+
+- Chỉ ADMIN vào `#/students` và `#/users`; route guard, menu và kiểm tra quyền backend giữ nguyên. [routeConfig](./src/app/routeConfig.js) đã đúng nên không cần đổi quyền.
+- [Sinh viên](./src/features/students/): danh sách 12 dòng/trang, bộ lọc q/lớp/trạng thái trên URL; thêm/sửa bằng React Hook Form, validation tại trường, khóa form khi đang gửi. Mã SV không sửa được. Backend tự tạo user đi kèm qua POST sinh viên; UI không gọi thêm endpoint tạo user.
+- [Tài khoản](./src/features/users/): danh sách 15 dòng/trang, q/role/page trên URL; khóa/mở bằng boolean `is_active`, reset mật khẩu mặc định theo vai trò. Dialog nêu đúng username/họ tên; chặn tự khóa/mở tài khoản đang đăng nhập theo backend.
+- Xóa sinh viên yêu cầu xác nhận, hiển thị lỗi 409 khi đã có đăng ký/điểm. Form giữ draft khi lỗi 400/403/409 hoặc mạng; lỗi mạng ghi rõ kết quả có thể đã được xử lý và không tự retry ghi.
+- [useAdminMutation](./src/features/users/useAdminMutation.js) chặn submit lặp, invalidate cache cùng phiên, không áp dụng phản hồi/toast sau logout. Mutation sinh viên làm mới students/users/transcripts/stats/grades/history; sửa/xóa làm trang cuối rỗng thì chuyển về trang hợp lệ và giữ bộ lọc.
+- Backend chỉ đồng bộ tên user khi sửa hồ sơ; email hồ sơ và tài khoản có thể khác nhau. Khóa/reset không thu hồi ngay JWT cũ; giao diện không hứa điều đó.
+
+### Kiểm thử ghi API thật (chỉ development/test đã xác định)
+
+[admin-live.spec.js](./src/features/users/tests/browser/admin-live.spec.js) mặc định bị skip, kể cả khi bật `LIVE_AUTH=1`. Chỉ chạy sau khi xác nhận backend đích của Vite proxy là development/test:
+
+```powershell
+$env:ADMIN_TEST_ENV='development' # hoặc test, đúng môi trường đã xác định
+$env:LIVE_ADMIN_WRITES='1'
+try {
+  npm.cmd --prefix fe-react run test:e2e -- src/features/users/tests/browser/admin-live.spec.js
+} finally {
+  Remove-Item Env:LIVE_ADMIN_WRITES
+  Remove-Item Env:ADMIN_TEST_ENV
+}
+```
+
+Test dùng ADMIN demo và TEACHER demo, tạo **một sinh viên mới** có mã `R5` + UUID và email `example.test` qua UI, kiểm tra user tạo kèm, trùng mã 409, sửa/đồng bộ tên, khóa/mở/login, reset mật khẩu và backend từ chối role khác. Chỉ đổi mật khẩu của tài khoản vừa tạo để xác minh reset thực sự có tác dụng. Xóa chính bản ghi mới qua UI và kiểm tra user cũng biến mất; nếu thất bại thì cleanup chỉ dùng ID nhận từ response 201 và mã chính xác của lượt chạy. Không seed/reset, không xóa theo prefix, không sửa bản ghi có sẵn. Test không tạo đăng ký học phần; lỗi xóa do đăng ký/điểm được kiểm tra bằng fixture.
+
+Nếu API đã tạo dữ liệu nhưng response bị mất trước khi nhận ID, không đoán ID để xóa; cần kiểm tra thủ công mã riêng của lượt chạy. Không coi test chưa chạy hoặc skip là nghiệm thu API ghi thành công.
 
 ## Route và ranh giới giai đoạn
 
@@ -120,8 +182,39 @@ Ngày 03/11/2026: `npm audit --omit=dev` báo 0; audit toàn bộ báo 6 mức m
 
 Ngày 04/11/2026 sau khi thêm hai dependency: chạy lại `npm.cmd audit --omit=dev` báo 0; installer vẫn báo 6 moderate cho toàn bộ tree.
 
-Tham khảo triển khai: [Vite](https://vite.dev/guide/), [HashRouter](https://reactrouter.com/7.18.5/api/declarative-routers/HashRouter), [Vitest](https://vitest.dev/guide/), [native dialog](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog).
+Tham khảo triển khai: [Vite](https://vite.dev/guide/), [useBlocker](https://reactrouter.com/7.18.5/api/hooks/useBlocker), [Vitest](https://vitest.dev/guide/), [native dialog](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog).
+
+## Nhập điểm — giai đoạn 6
+
+- ADMIN/TEACHER mở http://127.0.0.1:5173/#/entry, chọn học kỳ → lớp học phần. Danh sách lớp và quyền thao tác do API xác định.
+- [Feature nhập điểm](./src/features/grade-entry/) giữ draft theo enrollment ID; refetch không ghi đè dòng đang sửa. Lưu dòng hoặc Lưu tất cả chỉ gửi các dòng dirty qua PUT từng enrollment, không có transaction toàn bảng. Dòng lỗi giữ giá trị đã nhập và báo lỗi riêng; tổng kết/xếp loại lấy từ response chính thức.
+- Chỉ cuối kỳ bắt buộc. Chuyên cần/giữa kỳ có thể trống, điểm 0 hợp lệ, phạm vi 0–10 kiểm tra trước làm tròn; dấu phẩy được chấp nhận như backend. Nếu thiếu CC hoặc GK thì tổng kết dùng CK theo quy tắc hiện hữu.
+- Thêm sinh viên dùng mã SV qua endpoint enroll hiện có. Xóa điểm có xác nhận mã/tên SV/lớp, xóa lịch sử nhưng giữ enrollment theo backend. Grade ID từ response lưu được dùng ngay cho xóa/lịch sử.
+- Router vẫn dùng URL hash, nhưng [App](./src/app/App.jsx) chuyển sang `createHashRouter`/`RouterProvider` để dùng `useBlocker`. Menu, Back/Forward, đổi lớp/học kỳ và đăng xuất cần xác nhận khi còn draft; đang gửi thì chờ hoàn tất. Refresh/đóng trang dùng cảnh báo native `beforeunload` của trình duyệt.
+- Draft chỉ ở bộ nhớ của trang/phiên, không lưu điểm vào localStorage. Chấp nhận bỏ thay đổi, tải lại trang hoặc phiên bị thu hồi sẽ xóa draft. Trình duyệt có thể không hiện cảnh báo khi bị đóng cưỡng bức; không coi đây là cơ chế tự lưu.
+- [Browser fixture](./src/features/grade-entry/tests/browser/entry.spec.js) kiểm tra mutation và bảo vệ draft. [Đối chiếu live](./src/features/grade-entry/tests/browser/entry-live.spec.js) chỉ login/GET, so sánh mọi dòng của hai lớp được chọn cho từng ADMIN/TEACHER và kiểm tra GET lớp ngoài quyền trả 403.
+- **Chưa chạy lưu/xóa điểm hoặc enroll trên DB thật** do chưa xác định development/test. Để nghiệm thu, cần lớp và sinh viên thử riêng; kiểm tra lưu 0/10/thiếu thành phần, cập nhật tổng điểm tạo lịch sử, xóa điểm, enroll và 403 thao tác ghi. Không dùng hồ sơ đang sử dụng để test. API hiện không có xóa enrollment nên phải thống nhất dữ liệu thử giữ lại, không tự cleanup bằng SQL hay reset/seed.
+
+## Import Excel — giai đoạn 7
+
+ADMIN/TEACHER mở http://127.0.0.1:5173/#/import. [Feature import](./src/features/import/) gọi GET `/api/import/template` có Bearer token để lấy blob, tải tên `excel_template.xlsx`, rồi revoke object URL. POST `/api/import/grades` dùng FormData field `file`; browser tự đặt multipart boundary. Không đọc/parse workbook trong ứng dụng React và không thêm thư viện Excel vào bundle.
+
+- Picker/validation giữ `.xlsx,.xls` như baseline; không chặn theo MIME vì backend không có filter MIME/extension. Backend vẫn kiểm tra nội dung, sheet đầu, 4 cột bắt buộc và 5.000 dòng. Frontend chỉ chặn file thiếu, 0 byte, đuôi không phù hợp và dung lượng bị từ chối.
+- Multer cấu hình `5 * 1024 * 1024`; Busboy đang cài phát `LIMIT_FILE_SIZE` khi **đạt** giới hạn. Đã xác minh bằng middleware local cô lập, không gọi controller/DB: 5.242.879 byte nhận, 5.242.880 và 5.242.881 byte bị từ chối. UI vì thế yêu cầu file **nhỏ hơn 5 MiB**, không đổi backend.
+- Upload khóa file/nút khi pending, chống gửi trùng và không tự retry. Hiển thị tên file, trạng thái đang xử lý, không có phần trăm tiến độ giả. Kết quả giữ tên file đã gửi kể cả khi chọn file mới.
+- [ImportLeaveGuard](./src/features/import/ImportLeaveGuard.jsx) giữ màn hình khi menu/Back hoặc đăng xuất chủ động trong lúc upload đang xử lý; dialog cho ở lại đọc kết quả. Refresh/đóng tab có beforeunload. Mất phiên hoặc buộc rời trang không chứng minh server đã hủy các dòng đã commit.
+- Hiển thị nguyên total/created/updated/failed và row/message từ response; phân biệt toàn bộ thành công, thành công một phần, tất cả dòng lỗi và request thất bại. Tổng lỗi dùng `failed`; khi bị cắt, ghi rõ chỉ có tối đa 100 chi tiết lỗi đầu tiên. Bảng lỗi cuộn dọc, đọc được trên mobile.
+- Import cập nhật điểm cuối kỳ/tổng kết và **xóa CC/GK cũ**; mỗi dòng commit riêng. Giao diện nêu rõ trước khi gửi. Không tự tính điểm hoặc chọn lớp thay backend.
+- Khi created+updated>0, invalidate offering-students/grades/transcripts/grade-history/stats/offerings cùng session; không invalidation users/students/meta vì không thay đổi hồ sơ/danh mục. Với mất mạng, HTTP 5xx/408 hoặc response thành công không đúng cấu trúc, báo **chưa xác định kết quả**, làm mới cache có thể bị ảnh hưởng và yêu cầu kiểm tra dữ liệu trước khi gửi lại; không đoán số dòng đã lưu.
+- Tải mẫu thật ADMIN/TEACHER và GET STUDENT bị từ chối đã đạt. Các POST import trong test đều được mock/intercept. **Chưa chạy upload vào DB thật** do môi trường development/test chưa được xác định; không coi test fixture là nghiệm thu transaction/quyền import thật.
+- Hạn chế backend B02 trong [baseline](../docs/react-migration-baseline.md) vẫn còn: TEACHER thiếu hồ sơ teacher có thể không bị lọc lớp khi import. Đề xuất backend từ chối trường hợp này là công việc riêng; không vá quyền bằng lọc client.
+
+Kiểm tra riêng browser import (fixture mặc định; thêm LIVE_AUTH=1 chỉ bật tải mẫu/GET thật):
+
+```powershell
+npm.cmd --prefix fe-react run test:e2e -- src/features/import/tests/browser/import.spec.js
+```
 
 Tham khảo giai đoạn 3: [TanStack Query cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation), [QueryClient](https://tanstack.com/query/latest/docs/framework/react/reference/classes/QueryClient), [React Hook Form](https://react-hook-form.com/docs/useform).
 
-Xem [baseline](../docs/react-migration-baseline.md), [kế hoạch](../docs/ke-hoach-chuyen-frontend-react.md) và [nhật ký](../docs/react-migration-progress.md) trước khi thực hiện giai đoạn 4. Chưa tự chuyển sang trang đọc dữ liệu.
+Xem [baseline](../docs/react-migration-baseline.md), [kế hoạch](../docs/ke-hoach-chuyen-frontend-react.md) và [nhật ký](../docs/react-migration-progress.md) để đối chiếu ma trận C01–C21; cần hoàn tất kiểm thử ghi thật và xử lý riêng B02 trước khi nghiệm thu toàn bộ.

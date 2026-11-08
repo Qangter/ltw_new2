@@ -21,11 +21,11 @@ test('hash deep-link, refresh, logo, navigation and untouched API data', async (
   await expect.poll(() => page.locator('.brand-logo').evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true)
   await page.getByRole('link', { name: 'Nhập điểm', exact: true }).click()
   await expect(page).toHaveURL(/#\/entry$/)
-  await expect(page.getByText('Chức năng chưa được triển khai.', { exact: true })).toBeVisible()
+  await expect(page.getByText('Không có lớp học phần trong học kỳ này.', { exact: true })).toBeVisible()
   await page.goBack()
   await expect(page.getByRole('heading', { name: 'Bảng điểm sinh viên' })).toBeVisible()
   expect(apiRequests.length).toBeGreaterThan(0)
-  expect(apiRequests.every((url) => ['/api/auth/me', '/api/meta', '/api/students/42/transcript'].includes(new URL(url).pathname))).toBe(true)
+  expect(apiRequests.every((url) => ['/api/auth/me', '/api/meta', '/api/offerings', '/api/students/42/transcript'].includes(new URL(url).pathname))).toBe(true)
   expect(errors).toEqual([])
 })
 

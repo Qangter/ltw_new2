@@ -26,6 +26,29 @@ function setup(path, role = 'ADMIN', handler = () => undefined) {
 }
 
 describe('phase 4 read pages (mocked transport)', () => {
+  it('keeps one grade filter form through apply, pagination, Back and background refetch', async () => {
+    const { user, session } = setup('/grades?q=old&page=2')
+    await screen.findByRole('table', { name: 'Danh sách điểm' })
+    await user.clear(screen.getByLabelText('Mã / tên SV'))
+    await user.type(screen.getByLabelText('Mã / tên SV'), 'new')
+    await user.click(screen.getByRole('button', { name: 'Lọc', exact: true }))
+    await screen.findByRole('table', { name: 'Danh sách điểm' })
+    expect(screen.getAllByLabelText('Mã / tên SV')).toHaveLength(1)
+    expect(screen.getByTestId('url')).toHaveTextContent('/grades?q=new')
+    expect(screen.getByTestId('url')).not.toHaveTextContent('page=2')
+    await user.click(screen.getByRole('button', { name: 'Trang 2', exact: true }))
+    await screen.findByRole('table', { name: 'Danh sách điểm' })
+    expect(screen.getAllByLabelText('Mã / tên SV')).toHaveLength(1)
+    await user.click(screen.getByRole('button', { name: 'Test Back' }))
+    await user.click(screen.getByRole('button', { name: 'Test Back' }))
+    expect(screen.getAllByLabelText('Mã / tên SV')).toHaveLength(1)
+    expect(screen.getByLabelText('Mã / tên SV')).toHaveValue('old')
+    await user.type(screen.getByLabelText('Mã / tên SV'), ' draft')
+    await act(async () => { await session.getSnapshot().queryClient.invalidateQueries() })
+    expect(screen.getByLabelText('Mã / tên SV')).toHaveValue('old draft')
+    expect(screen.getAllByRole('table', { name: 'Danh sách điểm' })).toHaveLength(1)
+  })
+
   it('lookup restores URL filters/page, submits to page 1, Back/Forward restore form and query', async () => {
     const { user, fetchImpl } = setup('/lookup?q=old&class_id=1&page=2')
     const input = await screen.findByLabelText('Mã số / Họ tên')

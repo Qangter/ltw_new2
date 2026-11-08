@@ -13,7 +13,7 @@ export function GradeListPage() {
   const grades = useGrades(filters)
   return <><h1>Danh sách điểm</h1><Card>
     <QueryState query={meta}>{() => null}</QueryState>
-    <GradeFilters key={formKey} filters={filters} meta={meta.data} onApply={apply} />
-    <GradeResults key={formKey} query={grades} onPageChange={setPage} />
+    <GradeFilters key={`filters:${formKey}`} filters={filters} meta={meta.data} onApply={apply} />
+    <GradeResults key={`results:${formKey}`} query={grades} onPageChange={setPage} />
   </Card></>
 }

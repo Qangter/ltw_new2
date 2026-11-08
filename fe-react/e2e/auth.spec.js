@@ -65,6 +65,33 @@ test('logout in one tab retires the other tab session (mocked API)', async ({ pa
   await expect(second.getByLabel('Mật khẩu hiện tại')).toHaveCount(0)
 })
 
+test('logout then another user never shows the previous user data (fixture)', async ({ page }) => {
+  await mockReadApi(page)
+  let identity = { id: 1, username: 'old-admin', full_name: 'Old admin fixture', role: 'ADMIN' }
+  await page.route('**/api/auth/login', (route) => route.fulfill({ json: { token: `token-${identity.id}` } }))
+  await page.route('**/api/auth/me', (route) => route.fulfill({ json: identity }))
+  async function login() {
+    await page.getByLabel('Tên đăng nhập').fill(identity.username)
+    await page.getByLabel('Mật khẩu', { exact: true }).fill('fixture')
+    await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click()
+  }
+  await page.goto('/#/login')
+  await login()
+  await expect(page.getByRole('heading', { name: 'Tổng quan' })).toBeVisible()
+  await page.getByRole('link', { name: 'Danh sách điểm', exact: true }).click()
+  await expect(page.getByRole('table', { name: 'Danh sách điểm' })).toBeVisible()
+  await page.getByRole('button', { name: 'Đăng xuất' }).click()
+  identity = { id: 3, username: 'new-student', full_name: 'New student fixture', role: 'STUDENT' }
+  await login()
+  await expect(page.getByRole('heading', { name: 'Bảng điểm của tôi' })).toBeVisible()
+  await expect(page.getByText('Old admin fixture', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('table', { name: 'Danh sách điểm' })).toHaveCount(0)
+  await expect(page.getByRole('navigation').getByRole('link', { name: 'Tài khoản', exact: true })).toHaveCount(0)
+  await page.goBack()
+  await expect(page.getByRole('table', { name: 'Danh sách điểm' })).toHaveCount(0)
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('user')).id)).toBe(3)
+})
+
 // Opt-in REAL backend smoke. Uses existing documented demo credentials, read-only
 // login + /me + forbidden GET. Never changes passwords or writes application data.
 test.describe('live backend (opt-in)', () => {

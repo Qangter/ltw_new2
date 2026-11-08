@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { AppRoutes } from './AppRoutes.jsx'
 import { AppProviders } from './AppProviders.jsx'
 import { getMenuItems } from './routeConfig.js'
@@ -10,17 +10,16 @@ import { deferred, jsonResponse, testSession, userFixture } from '../test/authFi
 
 function renderApp(path = '/', options = {}) {
   const fixture = testSession(options)
-  render(<StrictMode><MemoryRouter initialEntries={[path]}><AppProviders session={fixture.session}><AppRoutes /></AppProviders></MemoryRouter></StrictMode>)
+  const router = createMemoryRouter([{ path: '*', element: <AppProviders session={fixture.session}><AppRoutes /></AppProviders> }], { initialEntries: [path] })
+  render(<StrictMode><RouterProvider router={router} /></StrictMode>)
   return fixture
 }
 
 describe('routes and forms with explicitly mocked auth API', () => {
-  it.each([
-    ['/entry', 'Nhập điểm'], ['/import', 'Import Excel'], ['/students', 'Quản lý sinh viên'], ['/users', 'Tài khoản'],
-  ])('%s remains an authorized placeholder without business requests', async (path, heading) => {
-    const { fetchMock } = renderApp(path)
-    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
-    expect(screen.getByText('Chức năng chưa được triển khai.')).toBeInTheDocument()
+  it('import waits for an explicit action before download/upload requests', async () => {
+    const { fetchMock } = renderApp('/import')
+    expect(await screen.findByRole('heading', { level: 1, name: 'Import Excel' })).toBeInTheDocument()
+    expect(screen.getByLabelText('File Excel')).toBeInTheDocument()
     expect(fetchMock.mock.calls.every(([url]) => url === '/api/auth/me')).toBe(true)
   })
 

@@ -1,6 +1,10 @@
 # Website Tra cứu Kết quả Thi Trực tuyến
 
-Frontend: HTML/CSS/JavaScript thuần · Backend: Node.js + Express · Database: MySQL 8.x (`diem_thi`)
+Frontend: React/Vite JavaScript và bản HTML/CSS/JavaScript cũ được giữ để rollback · Backend: Node.js + Express · Database: MySQL 8.x (`diem_thi`).
+
+React dùng `createHashRouter`/`RouterProvider` giữ URL hash, TanStack Query cho dữ liệu server và Auth Context cho phiên/quyền. Service/query hook tách theo feature; draft nhập điểm tách khỏi cache theo enrollment ID. GPA, thống kê, quyền và kết quả import do API quyết định. Xem [kiến trúc frontend](./fe-react/README.md), [baseline](./docs/react-migration-baseline.md) và [ma trận nghiệm thu hiện hành](./docs/react-migration-progress.md).
+
+**Trạng thái:** đã có cấu hình chạy bản build React qua Express; chưa nghiệm thu đầy đủ các luồng ghi DB thật của giai đoạn 5–7. Lỗi backend B02 vẫn là đề xuất riêng, chưa sửa quyền nghiệp vụ trong migration.
 
 ## Cấu trúc
 ```
@@ -19,16 +23,48 @@ fe/         Giao diện SPA (được Express phục vụ tĩnh)
   pages/*.html    khung HTML tĩnh của từng trang (dashboard, lookup, entry, grades, stats, students, users...)
   pages/common.html      các <template> dùng chung (thẻ thống kê, thanh tỷ lệ, phân trang)
   pages/modals/*.html    nội dung các hộp thoại (thêm/sửa sinh viên, lịch sử sửa điểm)
+fe-react/   React/Vite, component/service/query hook và tests
+  dist/         build production được Express phục vụ khi FRONTEND=react
 ```
 
 Backend giữ nguyên URL API và hợp đồng request/response; route chuyển request tới controller, controller dùng model để truy cập dữ liệu và service cho nghiệp vụ dùng chung. Các trang HTML trong `fe/pages/` là phần View của giao diện.
 
 ## Cài đặt (Windows)
+Các bước tạo DB dưới đây chỉ dành cho lần cài mới. Với database có sẵn, giữ cấu hình/dữ liệu hiện tại; không chạy lại setup/seed để migration hoặc kiểm thử.
+
 1. Tạo database: `mysql -u root -p < database\full_setup.sql`
 2. `cd be` → `copy .env.example .env` rồi sửa `DB_PASSWORD` (mật khẩu MySQL) và `JWT_SECRET`
 3. `npm install`
 4. `npm start`
 5. Mở http://localhost:3000
+
+## Build và chạy React bằng Express
+
+Yêu cầu Node `^22.13.0 || ^24.0.0 || >=26.0.0`; MySQL và cấu hình backend hiện có. Chạy từ root repository (dùng `npm.cmd` nếu PowerShell chặn npm.ps1):
+
+```powershell
+npm --prefix fe-react ci
+npm --prefix fe-react run lint
+npm --prefix fe-react test
+npm --prefix fe-react run build
+npm --prefix be run start:react
+```
+
+Mở http://localhost:3000/#/login. Dừng tiến trình đang chiếm cổng trước khi chạy; hoặc dùng `npm --prefix be run start:react -- 3001` để xem song song ở http://localhost:3001/#/login trong khi bản cũ vẫn ở cổng 3000. Script chỉ chọn frontend/cổng, không sửa file cấu hình hay dữ liệu.
+
+Để chạy bằng `npm --prefix be start`, đặt `FRONTEND=react` trong file cấu hình backend theo [.env.example](./be/.env.example) rồi restart. Mặc định `legacy`; chỉ nhận `legacy` hoặc `react`, sai giá trị báo lỗi khởi động. Biến shell ưu tiên hơn `.env`; script `start:react`/`start:legacy` chọn mode ưu tiên hơn cả hai.
+
+API giữ nguyên thứ tự routes → JSON 404 `/api` → static. Thiếu build React trả HTTP 503 và hướng dẫn build/rollback, không tự che lỗi bằng bản cũ. Hash route trực tiếp và refresh dùng cùng index. URL không có hash và asset không tồn tại trả 404 text, không trả HTML giả cho JavaScript/API. Index dùng `no-cache`, asset React có hash dùng cache immutable. Production gọi `/api` cùng origin, không cần Vite/proxy hoặc bí mật DB trong bundle.
+
+Phát triển: chạy backend cùng `npm --prefix fe-react run dev`; xem http://127.0.0.1:5173. Chi tiết biến proxy và lệnh test trong [README React](./fe-react/README.md).
+
+## Rollback về frontend cũ
+
+1. Dừng tiến trình Express phục vụ React bằng Ctrl+C hoặc công cụ quản lý tiến trình đang dùng.
+2. Đặt `FRONTEND=legacy` trong môi trường/file cấu hình backend, rồi `npm --prefix be start`; hoặc chạy `npm --prefix be run start:legacy` để chọn rõ bản cũ. Nếu dùng cổng riêng, truyền cùng cổng: `npm --prefix be run start:legacy -- 3001`.
+3. Mở lại `/#/login`, kiểm tra logo/asset, đăng nhập và API. Reload trang đang mở để nạp frontend đã đổi.
+
+Không xóa [frontend cũ](./fe/), không cần xóa build React, reset DB hay chạy migration SQL. Đã kiểm tra tự động React → dừng → legacy trên cùng cổng 5192 với Express/MySQL thật bằng `npm --prefix be run test:frontend:live` (chỉ đọc HTTP). Không tự deploy lên server ngoài.
 
 ## Tài khoản demo
 | Vai trò | Tài khoản | Mật khẩu |

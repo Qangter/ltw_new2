@@ -1,5 +1,6 @@
 import { EmptyState } from '../../../components/feedback/EmptyState.jsx'
 import { formatNumber } from '../../../utils/format.js'
+import './DistributionChart.css'
 
 const gradeColors = ['#2563eb', '#3b82f6', '#14b8a6', '#84cc16', '#facc15', '#f97316', '#dc2626', '#7f1d1d']
 const departmentColors = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6']
@@ -17,7 +18,7 @@ export function DonutChart({ items, labelKey, valueKey, colors }) {
   }, [])
   const background = `conic-gradient(${slices.map(({ color, start, end }) => `${color} ${start.toFixed(2)}% ${end.toFixed(2)}%`).join(',')})`
 
-  return <div className="pie-layout">
+  return <div className="pie-layout statistics-donut">
     <div className="pie-visual">
       <div className="pie-chart" style={{ background }}>
         <div className="pie-center"><strong>{formatNumber(total)}</strong><span>Tổng</span></div>
@@ -39,10 +40,10 @@ export function DistributionChart({ items }) {
 
 // Statistics uses count bars (legacy vStats), unlike the dashboard donut.
 export function DistributionBars({ items }) {
-  if (!items?.length) return <EmptyState title="Chưa có dữ liệu biểu đồ." />
+  if (!items?.some((item) => Number(item.total) > 0)) return <EmptyState title="Chưa có dữ liệu biểu đồ." />
   const max = Math.max(...items.map((item) => Number(item.total)), 1)
   return <div>{items.map((item) => <div className="bar-row" key={item.letter_grade}>
-    <span>{item.letter_grade}</span><div className="bar"><i style={{ width: `${Number(item.total) / max * 100}%` }} /></div><b>{formatNumber(item.total)}</b>
+    <span>{item.letter_grade}</span><div className="bar" aria-hidden="true"><i style={{ width: `${Number(item.total) / max * 100}%` }} /></div><b>{formatNumber(item.total)}</b>
   </div>)}</div>
 }
 

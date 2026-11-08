@@ -1,0 +1,6 @@
+.student-admin-form fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.student-admin-form .form-error { margin: 6px 0 0; font-size: 13px; }
+.student-admin-form input[readonly] { background: #f1f5f9; color: #475569; }
+@media (max-width: 520px) {
+  .student-admin-form .form-grid { grid-template-columns: minmax(0, 1fr); }
+}

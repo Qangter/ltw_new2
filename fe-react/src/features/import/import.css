@@ -1,0 +1,9 @@
+.import-form { margin-top: 1.25rem; }
+.import-form input[type="file"] { display: block; width: 100%; max-width: 100%; }
+.import-file-name, .import-warning, .import-result .wrap-cell { overflow-wrap: anywhere; }
+.import-warning { border-left: 3px solid #b45309; padding: .75rem; background: #fffbeb; }
+.import-result { margin-top: 1.25rem; }
+.import-result .table-wrap { max-height: 30rem; overflow: auto; }
+.import-result table { min-width: 0; table-layout: fixed; }
+.import-result th { white-space: normal; }
+.import-result th:first-child { width: 6rem; }

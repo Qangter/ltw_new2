@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:production": "playwright test --config playwright.production.config.js",
     "check:proxy": "node scripts/check-proxy.mjs"
   },
   "dependencies": {
