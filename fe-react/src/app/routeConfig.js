@@ -6,6 +6,7 @@ export const routeConfig = [
   { path: '/login', title: 'Đăng nhập', stage: 3, menu: false, roles: [] },
   { path: '/dashboard', title: 'Tổng quan', stage: 4, roles: STAFF, icon: 'dashboard' },
   { path: '/my', title: 'Bảng điểm của tôi', stage: 4, roles: ['STUDENT'], icon: 'grades' },
+  { path: '/my/statistics', title: 'Thống kê', stage: 4, roles: ['STUDENT'], icon: 'stats' },
   { path: '/lookup', title: 'Tra cứu sinh viên', stage: 4, roles: STAFF, icon: 'lookup' },
   { path: '/student/:id', title: 'Bảng điểm sinh viên', stage: 4, roles: STAFF, menu: false },
   { path: '/entry', title: 'Nhập điểm', stage: 6, roles: STAFF, icon: 'entry' },

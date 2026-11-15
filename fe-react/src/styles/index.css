@@ -1,5 +1,6 @@
 /* Shared base styles are bundled with the React application. */
 @import './base.css';
+@import './motion.css';
 
 .auth-status{max-width:680px;margin:60px auto;padding:24px}
 .auth-form fieldset{border:0;padding:0;margin:0;min-width:0}

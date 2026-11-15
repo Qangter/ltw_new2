@@ -1,0 +1,99 @@
+:root{
+  --motion-ease:cubic-bezier(.22,1,.36,1);
+  --motion-fast:180ms;
+  --motion-base:260ms;
+}
+
+@keyframes app-content-enter{
+  from{opacity:0;transform:translateY(10px) scale(.995)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes app-row-enter{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes app-chart-draw{
+  to{stroke-dashoffset:0}
+}
+@keyframes app-chart-point{
+  from{opacity:0;transform:scale(.55)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes app-chart-column{
+  from{opacity:.45;transform:scaleY(.06)}
+  to{opacity:1;transform:scaleY(1)}
+}
+@keyframes app-chart-bar{
+  from{opacity:.5;transform:scaleX(.02)}
+  to{opacity:1;transform:scaleX(1)}
+}
+@keyframes app-donut-enter{
+  from{opacity:0;transform:scale(.82) rotate(-10deg)}
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
+
+@media(prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth}
+  .main>*{animation:app-content-enter 460ms var(--motion-ease) both}
+  .main>:nth-child(2){animation-delay:35ms}
+  .main>:nth-child(3){animation-delay:70ms}
+  .main>:nth-child(4){animation-delay:105ms}
+  .main>:nth-child(5){animation-delay:140ms}
+  .main>:nth-child(6){animation-delay:175ms}
+
+  .sidebar .brand-logo{transition:transform var(--motion-base) var(--motion-ease),filter var(--motion-base) var(--motion-ease)}
+  .sidebar .brand:hover .brand-logo{transform:translateY(-1px);filter:drop-shadow(0 5px 10px rgba(96,165,250,.18))}
+  .sidebar nav a{transition:background var(--motion-base) var(--motion-ease),color var(--motion-base) var(--motion-ease),transform var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease)}
+  .sidebar nav a.active{animation:app-content-enter 320ms var(--motion-ease) both}
+
+  .card{transition:transform var(--motion-base) var(--motion-ease),border-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease)}
+  .card:hover{transform:translateY(-2px)}
+  .stat{transition:transform var(--motion-base) var(--motion-ease),border-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease)}
+
+  button:not(:disabled),.btn:not(:disabled){transition:background var(--motion-base) var(--motion-ease),border-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease),color var(--motion-base) var(--motion-ease),transform var(--motion-fast) var(--motion-ease)}
+  button:not(:disabled):active,.btn:not(:disabled):active{transform:translateY(0) scale(.98)}
+  input,select,textarea{transition:border-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease),background var(--motion-base) var(--motion-ease)}
+  a{transition:color var(--motion-base) var(--motion-ease),background-color var(--motion-base) var(--motion-ease)}
+
+  tbody tr{animation:app-row-enter 340ms var(--motion-ease) both}
+  tbody tr:nth-child(2){animation-delay:25ms}
+  tbody tr:nth-child(3){animation-delay:50ms}
+  tbody tr:nth-child(4){animation-delay:75ms}
+  tbody tr:nth-child(5){animation-delay:100ms}
+  tbody tr:nth-child(6){animation-delay:125ms}
+  tbody tr:nth-child(7){animation-delay:150ms}
+  tbody tr:nth-child(n+8){animation-delay:175ms}
+  .table-wrap{transition:border-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease)}
+  .table-wrap:hover{border-color:#cbd5e1;box-shadow:var(--shadow-sm)}
+
+  .form-grid>*{animation:app-content-enter 380ms var(--motion-ease) both}
+  .form-grid>:nth-child(2){animation-delay:35ms}
+  .form-grid>:nth-child(3){animation-delay:70ms}
+  .form-grid>:nth-child(4){animation-delay:105ms}
+  .form-grid>:nth-child(n+5){animation-delay:140ms}
+  .empty,.error-state,.loading-state{animation:app-content-enter 340ms var(--motion-ease) both}
+
+  .student-statistics__charts>.card{animation:app-content-enter 480ms var(--motion-ease) both}
+  .student-statistics__charts>.card:nth-child(2){animation-delay:55ms}
+  .student-statistics__charts>.card:nth-child(3){animation-delay:110ms}
+  .student-statistics__charts>.card:nth-child(4){animation-delay:165ms}
+  .student-chart path{stroke-dasharray:1;stroke-dashoffset:1;animation:app-chart-draw 1s var(--motion-ease) .12s forwards}
+  .student-chart circle{transform-box:fill-box;transform-origin:center;animation:app-chart-point 360ms var(--motion-ease) both}
+  .student-chart rect{transform-box:fill-box;transform-origin:center bottom;animation:app-chart-column 620ms var(--motion-ease) both}
+  .subject-score-chart__bar{transform-box:fill-box;transform-origin:left center;animation:app-chart-bar 620ms var(--motion-ease) both}
+  .academic-distribution__donut{animation:app-donut-enter 620ms var(--motion-ease) both}
+  .academic-distribution__legend li{animation:app-content-enter 360ms var(--motion-ease) both}
+  .academic-distribution__legend li:nth-child(2){animation-delay:45ms}
+  .academic-distribution__legend li:nth-child(3){animation-delay:90ms}
+  .academic-distribution__legend li:nth-child(4){animation-delay:135ms}
+  .academic-distribution__legend li:nth-child(5){animation-delay:180ms}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+@media print{
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}

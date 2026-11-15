@@ -7,6 +7,7 @@ import { LoginPage } from '../features/auth/LoginPage.jsx'
 import { ChangePasswordPage } from '../features/auth/ChangePasswordPage.jsx'
 import { DashboardPage } from '../features/dashboard/DashboardPage.jsx'
 import { MyTranscriptPage } from '../features/transcripts/MyTranscriptPage.jsx'
+import { StudentStatisticsPage } from '../features/transcripts/StudentStatisticsPage.jsx'
 import { StudentTranscriptPage } from '../features/transcripts/StudentTranscriptPage.jsx'
 import { LookupPage } from '../features/lookup/LookupPage.jsx'
 import { GradeEntryPage } from '../features/grade-entry/GradeEntryPage.jsx'
@@ -22,6 +23,7 @@ const PreviewPage = import.meta.env.DEV ? lazy(() => import('../features/preview
 const pages = {
   '/dashboard': DashboardPage,
   '/my': MyTranscriptPage,
+  '/my/statistics': StudentStatisticsPage,
   '/lookup': LookupPage,
   '/student/:id': StudentTranscriptPage,
   '/entry': GradeEntryPage,
