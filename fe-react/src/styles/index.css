@@ -1,14 +1,16 @@
 /* Shared base styles are bundled with the React application. */
+@import './design-tokens.css';
 @import './base.css';
+@import './auth-login.css';
 @import './motion.css';
 
 .auth-status{max-width:680px;margin:60px auto;padding:24px}
 .auth-form fieldset{border:0;padding:0;margin:0;min-width:0}
-.auth-form label{display:block;margin:16px 0 6px;font-weight:600}
+.auth-form:not(.login-form) label{display:block;margin:16px 0 6px;font-weight:600}
 .auth-form input{width:100%;min-width:0}
-.auth-form button[type=submit]{margin-top:24px}
-.login-card .auth-form button[type=submit]{width:100%}
-.auth-form .form-error{font-size:14px;margin:6px 0}
+.auth-form:not(.login-form) button[type=submit]{margin-top:24px}
+.login-card .auth-form:not(.login-form) button[type=submit]{width:100%}
+.auth-form:not(.login-form) .form-error{font-size:14px;margin:6px 0}
 .password-form{max-width:480px}
 .userbox b{overflow-wrap:anywhere}
 .read-filters{flex-wrap:wrap;align-items:end}
@@ -68,7 +70,6 @@
 @media(max-width:520px){
   .page-heading h1{font-size:22px}
   .card{padding:16px}
-  .login-card{padding:24px 20px}
   .pager{justify-content:flex-start}
   .react-modal{width:calc(100% - 20px);max-height:calc(100dvh - 20px)}
 }

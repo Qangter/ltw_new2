@@ -24,7 +24,7 @@ export function Sidebar() {
   return (
     <aside className="sidebar" aria-label="Điều hướng chính">
       <Link className="brand" to={homeForRole(role)} aria-label="Về trang chính">
-        <img className="brand-logo" src={logo} alt="Tra cứu kết quả thi" />
+        <img className="brand-logo" src={logo} alt="Eduresult" />
       </Link>
       <nav aria-label="Các chức năng">
         {getMenuItems(role).map(({ path, title, icon }) => {
@@ -37,11 +37,21 @@ export function Sidebar() {
           </Link>
         })}
       </nav>
-      <div className="userbox">
+      {pathname === '/dashboard' && role === 'ADMIN' ? <div className="dashboard-sidebar-footer">
+        <span className="dashboard-sidebar-label">Quản trị hệ thống</span>
+        <div className="dashboard-admin-chip">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+          <span>Quản trị viên</span>
+        </div>
+        <button type="button" className="dashboard-logout" onClick={() => requestLeave(() => logout())}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7" /></svg>
+          Đăng xuất
+        </button>
+      </div> : <div className="userbox">
         <div><b>{user?.full_name || user?.username}</b><span className="sidebar-note"><Badge value={role} /></span></div>
         <button type="button" onClick={() => requestLeave(() => logout())}>Đăng xuất</button>
         {import.meta.env.DEV && <Link to="/__components">Kiểm tra component</Link>}
-      </div>
+      </div>}
     </aside>
   )
 }

@@ -47,6 +47,9 @@ test('expired token, corrupt storage and mobile login layout (mocked API)', asyn
   await expect(page.getByRole('status')).toContainText('hết hạn')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await expect(page.getByLabel('Tên đăng nhập')).toBeVisible()
+  const storyTitle = page.locator('.login-story-title')
+  await expect(storyTitle).toHaveText('Tra cứu điểm thi trực tuyến')
+  await expect(storyTitle).toHaveText('Eduresult', { timeout: 5000 })
   await page.screenshot({ path: testInfo.outputPath('login-mobile.png'), fullPage: true, animations: 'disabled' })
 })
 

@@ -1,0 +1,30 @@
+:root {
+  /* Shared Eduresult tokens; alias the main application palette for future screens. */
+  --edu-primary: var(--edu-dashboard-brand, #3475f5);
+  --edu-primary-dark: var(--edu-dashboard-brand-dark, #2f65ec);
+  --edu-primary-light: var(--edu-dashboard-brand-soft, #edf4ff);
+  --edu-ink: var(--edu-dashboard-ink, #17294d);
+  --edu-body: #334155;
+  --edu-muted: var(--edu-dashboard-muted, #74829e);
+  --edu-line: var(--edu-dashboard-line, #e8edf6);
+  --edu-surface: var(--edu-dashboard-surface, #ffffff);
+  --edu-canvas: var(--edu-dashboard-canvas, #f3f6fc);
+  --edu-radius-card: 18px;
+  --edu-shadow-card: 0 24px 64px rgba(30, 64, 175, 0.18);
+  --edu-font-sans: 'Inter', 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
+
+  /* Shared palette for the dashboard and authenticated application screens. */
+  --edu-dashboard-canvas: #f3f6fc;
+  --edu-dashboard-surface: #ffffff;
+  --edu-dashboard-brand: #3475f5;
+  --edu-dashboard-brand-dark: #2f65ec;
+  --edu-dashboard-brand-soft: #edf4ff;
+  --edu-dashboard-ink: #17294d;
+  --edu-dashboard-muted: #74829e;
+  --edu-dashboard-line: #e8edf6;
+  --edu-dashboard-teal: #11ad98;
+  --edu-dashboard-teal-soft: #dff8f3;
+  --edu-dashboard-danger: #e34d57;
+  --edu-dashboard-danger-soft: #ffeaeb;
+  --edu-dashboard-shadow: 0 4px 13px rgba(32, 61, 108, .045);
+}

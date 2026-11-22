@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 1000" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="82" y1="40" x2="748" y2="944" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60A5FA"/>
+      <stop offset=".47" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="342" y1="395" x2="670" y2="790" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF" stop-opacity=".97"/>
+      <stop offset="1" stop-color="#E7F0FF" stop-opacity=".94"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="522" y1="692" x2="854" y2="932" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E40AF" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#1D4ED8" stop-opacity=".05"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(423 251 -288 486 734 158)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BFDBFE" stop-opacity=".62"/>
+      <stop offset="1" stop-color="#BFDBFE" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="286" y="367" width="510" height="524" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="20"/>
+      <feOffset dy="18"/>
+      <feColorMatrix values="0 0 0 0 0.118 0 0 0 0 0.251 0 0 0 0 0.686 0 0 0 .18 0"/>
+      <feBlend in2="SourceGraphic" result="shape"/>
+    </filter>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h840v1000H0z"/>
+  <path fill="url(#glow)" d="M0 0h840v1000H0z"/>
+  <circle cx="690" cy="170" r="208" fill="#93C5FD" fill-opacity=".16"/>
+  <circle cx="690" cy="170" r="154" stroke="#EFF6FF" stroke-opacity=".15" stroke-width="1.5"/>
+  <circle cx="690" cy="170" r="115" stroke="#EFF6FF" stroke-opacity=".11"/>
+  <path d="M0 576c154-74 282-81 407-17 138 71 254 86 433 18v423H0V576Z" fill="#3B82F6" fill-opacity=".38"/>
+  <path d="M0 704c145-73 270-79 407-25 145 57 269 65 433 2v319H0V704Z" fill="#1D4ED8" fill-opacity=".2"/>
+  <path d="M0 802c147-73 271-73 401-17 148 63 282 67 439 6v209H0V802Z" fill="url(#wave)"/>
+  <g opacity=".34" stroke="#EFF6FF" stroke-width="1.5">
+    <path d="M60 598c95-46 191-50 288-12"/>
+    <path d="M50 621c108-51 208-52 313-12"/>
+    <path d="M35 646c112-53 224-56 348-11"/>
+  </g>
+  <g filter="url(#shadow)" transform="rotate(-8 542 618)">
+    <rect x="340" y="420" width="330" height="402" rx="24" fill="url(#paper)"/>
+    <rect x="372" y="454" width="116" height="13" rx="6.5" fill="#60A5FA" fill-opacity=".78"/>
+    <rect x="372" y="486" width="206" height="8" rx="4" fill="#CBD5E1"/>
+    <rect x="372" y="504" width="162" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="372" y="544" width="266" height="145" rx="15" fill="#FFF" fill-opacity=".76"/>
+    <path d="M396 656v-38l39-24 38 12 42-43 36 16 61-44" stroke="#3B82F6" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+    <path d="M396 666h217" stroke="#E2E8F0" stroke-linecap="round" stroke-width="2"/>
+    <circle cx="554" cy="563" r="8" fill="#60A5FA"/>
+    <rect x="372" y="716" width="168" height="12" rx="6" fill="#CBD5E1"/>
+    <rect x="372" y="742" width="224" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="372" y="760" width="188" height="8" rx="4" fill="#E2E8F0"/>
+    <circle cx="615" cy="738" r="23" fill="#93C5FD" fill-opacity=".3"/>
+    <path d="m604 739 8 8 15-18" stroke="#2563EB" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+  </g>
+  <g transform="rotate(8 246 778)" opacity=".8">
+    <rect x="150" y="731" width="150" height="98" rx="16" fill="#BFDBFE" fill-opacity=".32" stroke="#EFF6FF" stroke-opacity=".55"/>
+    <path d="M177 787h96" stroke="#EFF6FF" stroke-linecap="round" stroke-width="7"/>
+    <path d="M177 805h67" stroke="#EFF6FF" stroke-linecap="round" stroke-opacity=".65" stroke-width="6"/>
+  </g>
+  <circle cx="753" cy="446" r="9" fill="#BFDBFE" fill-opacity=".72"/>
+  <circle cx="284" cy="332" r="5" fill="#BFDBFE" fill-opacity=".8"/>
+  <circle cx="716" cy="546" r="5" fill="#EFF6FF" fill-opacity=".55"/>
+</svg>

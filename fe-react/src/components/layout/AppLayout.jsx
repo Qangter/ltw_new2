@@ -1,11 +1,12 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar.jsx'
 import { useAuth } from '../../features/auth/useAuth.js'
 
 export function AppLayout() {
   const { notice } = useAuth()
+  const { pathname } = useLocation()
   return (
-    <div className="layout">
+    <div className={`layout${pathname === '/dashboard' ? ' dashboard-layout' : ''}`}>
       <a className="skip-link" href="#main-content" onClick={(event) => {
         event.preventDefault()
         document.getElementById('main-content')?.focus()
